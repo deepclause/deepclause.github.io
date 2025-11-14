@@ -355,10 +355,6 @@ format_solved_grid(SolvedGrid, MarkdownGrid) :-
     human-readable markdown table representing the Sudoku board. Add separators for the 3x3 blocks. 
     The output `MarkdownGrid` should be a single markdown string.").
 
-find_online_solvers(SearchResults, SolverLinksSummary) :-
-    @("Analyze the `SearchResults` for 'online sudoku solver from image'. Extract the top 2 most promising URLs that lead to a tool where 
-    a user can upload an image to solve a Sudoku. Format the output as a markdown bulleted list string in `SolverLinksSummary`.").
-
 % Sudoku solver using Constraint Logic Programming over Finite Domains (CLP(FD))
 % This is a standard, well-known Prolog implementation for solving Sudoku.
 sudoku(Rows) :-
