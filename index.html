@@ -38,6 +38,9 @@
                 <div class="hero-cta">
                     <a href="https://github.com/deepclause/deepclause-desktop" target="_blank" class="btn btn-primary">View on GitHub</a>
                 </div>
+                <div class="hero-video">
+                    <iframe src="https://www.youtube.com/embed/Oyt3NGDZa6Y" title="DeepClause Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+                </div>
             </div>
         </div>
     </section>
@@ -355,6 +358,10 @@ format_solved_grid(SolvedGrid, MarkdownGrid) :-
     human-readable markdown table representing the Sudoku board. Add separators for the 3x3 blocks. 
     The output `MarkdownGrid` should be a single markdown string.").
 
+find_online_solvers(SearchResults, SolverLinksSummary) :-
+    @("Analyze the `SearchResults` for 'online sudoku solver from image'. Extract the top 2 most promising URLs that lead to a tool where 
+    a user can upload an image to solve a Sudoku. Format the output as a markdown bulleted list string in `SolverLinksSummary`.").
+
 % Sudoku solver using Constraint Logic Programming over Finite Domains (CLP(FD))
 % This is a standard, well-known Prolog implementation for solving Sudoku.
 sudoku(Rows) :-
@@ -464,7 +471,7 @@ agent_main :-
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2025 DeepClause.</p>
+                <p>&copy; 2025 DeepClause. ISC License.</p>
                 <p class="footer-credits">Built with ❤️ for the neurosymbolic AI community</p>
             </div>
         </div>
