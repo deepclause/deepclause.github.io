@@ -1,42 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="DeepClause - The Missing Logic Agent. A neurosymbolic AI system bridging symbolic reasoning and neural language models.">
+    <meta name="description"
+        content="DeepClause - The Missing Logic Agent. A neurosymbolic AI system bridging symbolic reasoning and neural language models.">
     <title>DeepClause - The Missing Logic Agent</title>
-    <link rel="stylesheet" href="styles.css">
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Inter/JetBrains for DeepClause content fidelity -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* Specific overrides for DeepClause content adaptation */
+        .nav-logo {
+            height: 40px;
+        }
+
+        .hero-logo {
+            height: 100px;
+            margin-bottom: 20px;
+        }
+
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            /* 16:9 Aspect Ratio */
+            height: 0;
+            border: 1px solid var(--color-fg);
+            background: #000;
+        }
+
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .comparison-list li {
+            list-style: none;
+            margin-bottom: 10px;
+            font-family: var(--font-mono);
+        }
+
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+    </style>
 </head>
+
 <body>
-    <!-- Navigation -->
-    <nav class="nav">
-        <div class="container nav-container">
-            <div class="nav-brand">
-                <img src="deepclause.png" alt="DeepClause Logo" class="nav-logo">
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#what-is">What is DeepClause?</a></li>
-                <li><a href="#features">Features</a></li>
-                <li><a href="#use-cases">Use Cases</a></li>
-                <li><a href="https://github.com/deepclause/deepclause-desktop" target="_blank" class="nav-github">GitHub</a></li>
-            </ul>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="#" class="logo">
+                <img src="https://www.deepclause.ai/deepclause.png" alt="DeepClause Logo" class="nav-logo"
+                    style="vertical-align: middle;">
+                <span style="margin-left: 10px; vertical-align: middle;">DeepClause</span>
+            </a>
+            <nav class="nav">
+                <a href="https://agentvm.deepclause.ai/">AgentVM</a>
+                <a href="#what-is">What is DeepClause?</a>
+                <a href="#features">Features</a>
+                <a href="#use-cases">Use Cases</a>
+                <a href="https://github.com/deepclause/deepclause-desktop" target="_blank">GitHub</a>
+            </nav>
         </div>
-    </nav>
+    </header>
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <img src="deepclause.png" alt="DeepClause Logo" class="hero-logo">
-                <p class="hero-subtitle">The Missing Logic Agent</p>
-                <p class="hero-description">
-                    A neurosymbolic AI system that bridges the gap between symbolic reasoning and neural language models
+        <div class="container heroSplit">
+            <div class="heroLeft reveal">
+                <img src="https://www.deepclause.ai/deepclause.png" alt="DeepClause Logo" class="hero-logo"
+                    style="display: none;"> <!-- Hidden in desktop layout as per AgentVM style, or keep if critical -->
+                <h1 class="headline">The Missing Logic Agent</h1>
+                <p class="subheadline">
+                    A neurosymbolic AI system that bridges the gap between symbolic reasoning and neural language
+                    models.
                 </p>
-                <div class="hero-cta">
-                    <a href="https://github.com/deepclause/deepclause-desktop" target="_blank" class="btn btn-primary">View on GitHub</a>
+                <div class="ctaGroup">
+                    <a href="https://github.com/deepclause/deepclause-desktop" class="buttonPrimary"
+                        target="_blank">View on GitHub</a>
+                    <a href="#what-is" class="buttonSecondary">Learn More</a>
+                </div>
+            </div>
+            <div class="heroRight">
+                <div class="iframe-container" style="box-shadow: 15px 15px 0 var(--color-border);">
+                    <iframe src="https://www.youtube.com/embed/Oyt3NGDZa6Y" title="DeepClause Demo" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
                 </div>
                 <div class="hero-video">
                     <iframe src="https://www.youtube.com/embed/Oyt3NGDZa6Y" title="DeepClause Demo" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
@@ -46,437 +115,276 @@
     </section>
 
     <!-- What is DeepClause Section -->
-    <section class="section" id="what-is">
+    <section id="what-is" class="section">
         <div class="container">
-            <h3 class="section-title">🧠 What is DeepClause?</h2>
-            <div class="content-box">
-                
-                <p class="large-text">
-                    <strong>DeepClause</strong> is a <strong>neurosymbolic AI system and Agent framework</strong> that bridges the gap 
-                    between symbolic reasoning and neural language models. Unlike pure LLM-based agents that struggle with 
-                    complex logic, multi-step reasoning, and deterministic behavior, DeepClause uses <strong>DML (DeepClause 
-                    Meta Language)</strong> - a Prolog-based DSL - to encode agent behaviors as executable logic programs.
+            <h2 class="sectionTitle reveal">What is DeepClause?</h2>
+
+            <div class="reveal" style="margin-bottom: 60px;">
+                <p class="subheadline" style="max-width: 100%;">
+                    <strong>DeepClause</strong> is a <strong>neurosymbolic AI system and Agent framework</strong> that
+                    bridges the gap
+                    between symbolic reasoning and neural language models. Unlike pure LLM-based agents that struggle
+                    with
+                    complex logic, multi-step reasoning, and deterministic behavior, DeepClause uses <strong>DML
+                        (DeepClause
+                        Meta Language)</strong> - a Prolog-based DSL - to encode agent behaviors as executable logic
+                    programs.
                 </p>
-                <p>&nbsp;</p>
-                <p class="large-text">
-                    The goal of this project is to allow users to build <strong>"accountable agents."</strong> 
-                    These are systems that are not only contextually aware (LLMs) and goal-oriented (Agents), 
-                    but also logically sound (Prolog), introspectively explainable, and operationally safe. 
-                    This integrated approach addresses the critical shortcomings of purely neural systems 
-                    by embedding them within a framework of formal logic and secure execution, 
-                    laying a principled foundation for the future of trustworthy autonomous systems.
+                <p style="margin-bottom: 20px; font-size: 1.1rem; opacity: 0.9;">
+                    The goal of this project is to allow users to build <strong>"accountable agents."</strong>
+                    These are systems that are not only contextually aware (LLMs) and goal-oriented (Agents),
+                    but also logically sound (Prolog), introspectively explainable, and operationally safe.
                 </p>
             </div>
 
-            <div class="two-column">
-                <div class="column">
-                    <h3>Modern LLMs Struggle With:</h3>
-                    <ul class="fail-list">
+            <div class="heroSplit" style="align-items: flex-start; margin-bottom: 60px;">
+                <div class="featureCard reveal">
+                    <h3 class="featureTitle" style="color: #d73a49;">Modern LLMs Struggle With:</h3>
+                    <ul class="comparison-list">
                         <li>✗ Deterministic execution</li>
-                        <li>✗ Complex logical reasoning (constraint solving, formal verification)</li>
-                        <li>✗ Verifiable, inspectable decision-making</li>
+                        <li>✗ Complex logical reasoning</li>
+                        <li>✗ Verifiable decision-making</li>
                     </ul>
                 </div>
-                <div class="column">
-                    <h3>Traditional Logic Programming Lacks:</h3>
-                    <ul class="fail-list">
+                <div class="featureCard reveal" style="transition-delay: 0.1s;">
+                    <h3 class="featureTitle" style="color: #6f42c1;">Traditional Logic Lacks:</h3>
+                    <ul class="comparison-list">
                         <li>✗ Natural language understanding</li>
-                        <li>✗ Semantic reasoning over unstructured text</li>
-                        <li>✗ Flexible adaptation to novel tasks</li>
+                        <li>✗ Semantic reasoning over text</li>
+                        <li>✗ Flexible adaptation</li>
                     </ul>
                 </div>
             </div>
 
-            <div class="highlight-box">
-                <p class="large-text">
-                    <strong>DeepClause combines both paradigms:</strong> Prolog handles the logical scaffolding, control flow, 
-                    and symbolic reasoning, while LLMs provide natural language understanding, semantic extraction, and content generation.
+            <div class="reveal"
+                style="text-align: center; border: 1px solid var(--color-accent); padding: 40px; background: rgba(0, 102, 204, 0.05);">
+                <p class="subheadline" style="margin: 0 auto;">
+                    <strong>DeepClause combines both paradigms:</strong> Prolog handles the logical scaffolding, control
+                    flow,
+                    and symbolic reasoning, while LLMs provide natural language understanding, semantic extraction, and
+                    content generation.
                 </p>
-                <div style="text-align: center; margin-top: 2rem;">
-                    <a href="https://github.com/deepclause/deepclause-desktop" target="_blank" class="btn btn-primary">
-                        View on GitHub →
-                    </a>
-                </div>
             </div>
 
-            <div class="architecture-section">
-                <h3>Three-Layer Architecture</h3>
-                <div class="architecture-grid">
-                    <div class="arch-card">
-                        <div class="arch-icon">🔧</div>
-                        <h4>JavaScript Layer</h4>
-                        <p>Electron/Node.js orchestration, LLM integration, tool calling</p>
+            <div class="reveal" style="margin-top: 80px;">
+                <h3 class="sectionTitle" style="font-size: 2rem; margin-bottom: 40px;">Three-Layer Architecture</h3>
+                <div class="featuresGrid">
+                    <div class="featureCard">
+                        <div style="font-size: 2rem; margin-bottom: 15px;">🔧</div>
+                        <h3 class="featureTitle">JavaScript Layer</h3>
+                        <p class="featureDesc">Electron/Node.js orchestration, LLM integration, tool calling</p>
                     </div>
-                    <div class="arch-card">
-                        <div class="arch-icon">⚙️</div>
-                        <h4>WebAssembly Layer</h4>
-                        <p><a href="https://www.swi-prolog.org/" target="_blank">SWI-Prolog</a> WASM module for symbolic reasoning and logic execution</p>
+                    <div class="featureCard">
+                        <div style="font-size: 2rem; margin-bottom: 15px;">⚙️</div>
+                        <h3 class="featureTitle">WebAssembly Layer</h3>
+                        <p class="featureDesc"><a href="https://www.swi-prolog.org/" target="_blank"
+                                style="text-decoration: underline;">SWI-Prolog</a> WASM module for symbolic reasoning
+                            and logic execution</p>
                     </div>
-                    <div class="arch-card">
-                        <div class="arch-icon">🛡️</div>
-                        <h4>Isolated Linux VM</h4>
-                        <p><a href="https://github.com/copy/v86" target="_blank">V86</a> emulator for sandboxed Python/Bash execution</p>
+                    <div class="featureCard">
+                        <div style="font-size: 2rem; margin-bottom: 15px;">🛡️</div>
+                        <h3 class="featureTitle">Isolated Linux VM</h3>
+                        <p class="featureDesc"><a href="https://github.com/copy/v86" target="_blank"
+                                style="text-decoration: underline;">V86</a> emulator for sandboxed Python/Bash execution
+                        </p>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-     <!-- Use Cases Section -->
-    <section class="section" id="use-cases">
-        <div class="container">
-            <h2 class="section-title">💡 Video Examples</h2>
-            <p class="section-subtitle">From Linear Programming to Agentic Browse Use</p>
-            
-            <div class="video-grid">
-                <!-- Video 1: Browser Use -->
-                <div class="video-card">
-                    <div class="video-embed">
-                        <iframe 
-                            src="https://www.youtube.com/embed/jTpOLHAPTUc?rel=0" 
-                            title="DeepClause - Browser Use" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <h3>Browser Use</h3>
-                    <p>Watch DeepClause interact with web browsers via Playwright MCP.</p>
-                </div>
-
-                <!-- Video 2: Linear Programming -->
-                <div class="video-card">
-                    <div class="video-embed">
-                        <iframe 
-                            src="https://www.youtube.com/embed/O6vLY7hmnd0?rel=0" 
-                            title="DeepClause - Linear Programming" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <h3>Linear Programming</h3>
-                    <p>See how DeepClause solves optimization problems using constraint programming.</p>
-                </div>
-
-                <!-- Video 3: Reasoning and Explanation -->
-                <div class="video-card">
-                    <div class="video-embed">
-                        <iframe 
-                            src="https://www.youtube.com/embed/PyYntBpIQr8?rel=0" 
-                            title="DeepClause - Reasoning and Explanation" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <h3>Reasoning and Explanation</h3>
-                    <p>Explore DeepClause's explainable AI capabilities with transparent reasoning and step-by-step traces.</p>
-                </div>
-
-                <!-- Video 4: Logic Puzzle -->
-                <div class="video-card">
-                    <div class="video-embed">
-                        <iframe 
-                            src="https://www.youtube.com/embed/fdOjptwbjcA?rel=0" 
-                            title="DeepClause - Logic Puzzle" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <h3>Logic Puzzle Solving</h3>
-                    <p>Watch DeepClause solve complex logic puzzles using symbolic reasoning and constraint solving.</p>
-                </div>
-
-                <!-- Video 5: Linux VM Use -->
-                <div class="video-card">
-                    <div class="video-embed">
-                        <iframe 
-                            src="https://www.youtube.com/embed/rImhpXkEFYU?rel=0" 
-                            title="DeepClause - Linux VM Use" 
-                            frameborder="0" 
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                            allowfullscreen>
-                        </iframe>
-                    </div>
-                    <h3>Linux VM Execution</h3>
-                    <p>See DeepClause execute Python scripts and bash commands in a sandboxed Linux VM environment.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="section section-alt" id="features">
+    <!-- Use Cases Section (Video Examples) -->
+    <section id="use-cases" class="section">
         <div class="container">
-            <h2 class="section-title">✨ Key Features</h2>
-            
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Hybrid Execution Model</h3>
-                    <ul>
-                        <li>Symbolic reasoning via Prolog (pattern matching, unification, constraint solving)</li>
-                        <li>Neural understanding via LLMs (semantic extraction, content generation)</li>
-                        <li>Seamless integration through @-predicates</li>
-                    </ul>
+            <h2 class="sectionTitle reveal">Video Examples</h2>
+            <div class="featuresGrid">
+                <!-- Video 1 -->
+                <div class="featureCard reveal">
+                    <div class="iframe-container" style="margin-bottom: 20px;">
+                        <iframe src="https://www.youtube.com/embed/jTpOLHAPTUc?rel=0" title="DeepClause - Browser Use"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <h3 class="featureTitle">Browser Use</h3>
+                    <p class="featureDesc">Interaction with web browsers via Playwright MCP.</p>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🔍</div>
-                    <h3>Explainability Out of the Box</h3>
-                    <ul>
-                        <li>Transparent Logic: Every skill is readable Prolog source code</li>
-                        <li>Execution Tracing: See exactly which predicates were called</li>
-                        <li>AI vs Logic Attribution: Know which decisions were symbolic vs neural</li>
-                        <li>Plain-English Summaries and reliability estimates</li>
-                    </ul>
+                <!-- Video 2 -->
+                <div class="featureCard reveal" style="transition-delay: 0.1s;">
+                    <div class="iframe-container" style="margin-bottom: 20px;">
+                        <iframe src="https://www.youtube.com/embed/O6vLY7hmnd0?rel=0"
+                            title="DeepClause - Linear Programming" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <h3 class="featureTitle">Linear Programming</h3>
+                    <p class="featureDesc">Solving optimization problems using constraint programming.</p>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🔧</div>
-                    <h3>Rich Tool Ecosystem</h3>
-                    <ul>
-                        <li>Web Search: Google, Brave, Google Scholar integration</li>
-                        <li>Linux VM: Execute Python scripts, bash commands</li>
-                        <li>File I/O: Read/write workspace files with sandboxing</li>
-                        <li>MCP Protocol: Extensible tool integration</li>
-                    </ul>
+                <!-- Video 3 -->
+                <div class="featureCard reveal" style="transition-delay: 0.2s;">
+                    <div class="iframe-container" style="margin-bottom: 20px;">
+                        <iframe src="https://www.youtube.com/embed/PyYntBpIQr8?rel=0"
+                            title="DeepClause - Reasoning and Explanation" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <h3 class="featureTitle">Reasoning & Explanation</h3>
+                    <p class="featureDesc">Transparent reasoning and step-by-step traces.</p>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🧩</div>
-                    <h3>Declarative Skills</h3>
-                    <ul>
-                        <li>Skills as Code: Every capability encoded as a .dml file</li>
-                        <li>Multi-branch Logic: Sophisticated fallback strategies</li>
-                        <li>Inspectable & Debuggable: Read the actual logic</li>
-                        <li>Composable: Orchestrate complex workflows</li>
-                    </ul>
+                <!-- Video 4 -->
+                <div class="featureCard reveal" style="transition-delay: 0.3s;">
+                    <div class="iframe-container" style="margin-bottom: 20px;">
+                        <iframe src="https://www.youtube.com/embed/fdOjptwbjcA?rel=0" title="DeepClause - Logic Puzzle"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <h3 class="featureTitle">Logic Puzzle Solving</h3>
+                    <p class="featureDesc">Complex logic puzzles using symbolic reasoning.</p>
                 </div>
-
-                <div class="feature-card">
-                    <div class="feature-icon">🔄</div>
-                    <h3>Build Automations, Interactive Workflows and fully fledged autonomous Agents</h3>
-                    <ul>
-                        <li>Typed Parameters: File pickers, dropdowns, multi-select</li>
-                        <li>Streaming Output: Real-time progress updates</li>
-                        <li>User Input: Pause execution for clarification</li>
-                        <li>Cooperative Execution: Non-blocking async model</li>
-                    </ul>
+                <!-- Video 5 -->
+                <div class="featureCard reveal" style="transition-delay: 0.4s;">
+                    <div class="iframe-container" style="margin-bottom: 20px;">
+                        <iframe src="https://www.youtube.com/embed/rImhpXkEFYU?rel=0" title="Linux VM" frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen></iframe>
+                    </div>
+                    <h3 class="featureTitle">Linux VM Execution</h3>
+                    <p class="featureDesc">Executing Python/Bash in sandboxed Linux VM.</p>
                 </div>
+            </div>
+        </div>
+    </section>
 
-                <div class="feature-card">
-                    <div class="feature-icon">🛡️</div>
-                    <h3>Security by Design</h3>
-                    <ul>
-                        <li>Workspace-restricted file access</li>
-                        <li>VM sandboxing for untrusted code</li>
-                        <li>Explicit tool invocation</li>
-                    </ul>
+    <!-- Key Features Section -->
+    <section id="features" class="section">
+        <div class="container">
+            <h2 class="sectionTitle reveal">Key Features</h2>
+            <div class="featuresGrid">
+                <div class="featureCard reveal">
+                    <h3 class="featureTitle">🎯 Hybrid Execution</h3>
+                    <p class="featureDesc">Symbolic reasoning via Prolog + Neural understanding via LLMs. Seamless
+                        integration via @-predicates.</p>
+                </div>
+                <div class="featureCard reveal">
+                    <h3 class="featureTitle">🔍 Explainability</h3>
+                    <p class="featureDesc">Readable Prolog source code. Execution tracing. Attribution of symbolic vs
+                        neural decisions.</p>
+                </div>
+                <div class="featureCard reveal">
+                    <h3 class="featureTitle">🔧 Rich Tool Ecology</h3>
+                    <p class="featureDesc">Web Search, Linux VM, File I/O, MCP Protocol integration.</p>
+                </div>
+                <div class="featureCard reveal">
+                    <h3 class="featureTitle">🧩 Declarative Skills</h3>
+                    <p class="featureDesc">Skills as Code (.dml). Multi-branch logic. Inspectable, debuggable, and
+                        composable.</p>
+                </div>
+                <div class="featureCard reveal">
+                    <h3 class="featureTitle">🔄 Autonomous Agents</h3>
+                    <p class="featureDesc">Typed Parameters, Streaming Output, Human-in-the-loop, Cooperative
+                        non-blocking execution.</p>
+                </div>
+                <div class="featureCard reveal">
+                    <h3 class="featureTitle">🛡️ Security by Design</h3>
+                    <p class="featureDesc">Workspace-restricted file access. VM sandboxing. Explicit tool invocation.
+                    </p>
                 </div>
             </div>
         </div>
     </section>
 
     <!-- Code Examples Section -->
-    <section class="section section-alt" id="code-examples">
+    <section class="section">
         <div class="container">
-            <h2 class="section-title">💻 Code Examples</h2>
-            <p class="section-subtitle">Simplified DML programs demonstrating DML lanaguage features</p>
-            
-            <div class="example-tabs">
-                
+            <h2 class="sectionTitle reveal">Code Examples</h2>
 
-                <!-- Example 2: Deep Research Agent -->
-                <div class="example-card">
-                    <div class="example-header">
-                        <h3>🔍 Deep Research Agent</h3>
-                        <span class="example-badge">Multi-Step Research</span>
-                    </div>
-                    <p class="example-description">
-                        Conducts comprehensive research by orchestrating web searches, extracting information with LLM, 
-                        verifying completeness with Prolog logic, and generating citation-backed reports.
-                    </p>
-                    <pre><code class="language-prolog">% LLM extracts topic overview from search results
-understand_topic(SearchResults, Topic, Overview) :-
-    @("Analyze `SearchResults` for `Topic`. 
-       Generate a 2-3 sentence `Overview`.").
+            <div class="reveal" style="margin-bottom: 40px;">
+                <h3 class="headline" style="font-size: 1.5rem; margin-bottom: 20px;">🔍 Deep Research Agent</h3>
+                <div class="terminalWindow" style="max-width: 100%;">
+                    <div class="terminalHeader"><span>research_agent.dml</span></div>
+                    <div class="terminalBody"
+                        style="color: #d4d4d4; font-family: 'Fira Code', monospace; line-height: 1.5; font-size: 0.85rem;">
+                        <span style="color: #6a9955;">% LLM extracts topic overview from search results</span>
+                        understand_topic(SearchResults, Topic, Overview) :-
+                        @(<span style="color: #ce9178;">"Analyze `SearchResults` for `Topic`.
+                            Generate a 2-3 sentence `Overview`."</span>).
 
-% LLM crafts targeted search queries
-craft_queries(Topic, Overview, Queries) :-
-    @("Based on `Topic` and `Overview`, 
-       generate 3-5 targeted search queries as a list.").
+                        <span style="color: #6a9955;">% LLM handles semantic understanding, Prolog handles workflow
+                            control</span>
+                        agent_main :-
+                        param(<span style="color: #ce9178;">"topic"</span>, <span style="color: #ce9178;">"Research
+                            topic"</span>, Topic),
 
-% LLM processes content and structures report
-structure_report(AllResults, Topic, Structure, Sources) :-
-    @("Analyze `AllResults`. If sufficient, generate 
-       `Structure` (outline) and `Sources` (URLs).").
+                        <span style="color: #6a9955;">% Initial search and understanding</span>
+                        tool(web_search(Topic, num=5), InitialResults),
+                        understand_topic(InitialResults, Topic, Overview),
 
-agent_main :-
-    param("topic", "Research topic", Topic),
-    
-    % Initial search and understanding
-    tool(web_search(Topic, num=5), InitialResults),
-    understand_topic(InitialResults, Topic, Overview),
-    
-    % Targeted searches
-    craft_queries(Topic, Overview, Queries),
-    findall(R, (member(Q, Queries), 
-                tool(web_search(Q, num=10), R)), Results),
-    
-    % Structure and generate report
-    structure_report(Results, Topic, Structure, Sources),
-    write_report(Structure, Results, Sources, Report),
-    write_to_file("research_report.md", Report),
-    
-    answer("Research complete! Report saved to research_report.md").</code></pre>
-                    <div class="example-footer">
-                        <strong>Key Insight:</strong> LLM handles semantic understanding, Prolog handles workflow control and verification.
+                        <span style="color: #6a9955;">% Targeted searches</span>
+                        craft_queries(Topic, Overview, Queries),
+                        findall(R, (member(Q, Queries),
+                        tool(web_search(Q, num=10), R)), Results),
+
+                        <span style="color: #6a9955;">% Structure and generate report</span>
+                        structure_report(Results, Topic, Structure, Sources),
+                        write_report(Structure, Results, Sources, Report),
+                        write_to_file(<span style="color: #ce9178;">"research_report.md"</span>, Report),
+
+                        answer(<span style="color: #ce9178;">"Research complete! Report saved."</span>).
                     </div>
                 </div>
-
-                <!-- Example 3: Sudoku Solver with OCR -->
-                <div class="example-card">
-                    <div class="example-header">
-                        <h3>🧩 Sudoku Solver with OCR</h3>
-                        <span class="example-badge">Vision + CLP(FD)</span>
-                    </div>
-                    <p class="example-description">
-                        Extracts Sudoku puzzles from images using vision AI, then solves them with Prolog's 
-                        CLP(FD) constraint solver. Shows hybrid AI-symbolic reasoning.
-                    </p>
-                    <pre><code class="language-prolog">% Standard CLP(FD) Sudoku solver
-parse_sudoku_string_to_prolog(String, List) :-
-    @("You are given a string containing a sudoku in the format `[[5,3,0,0,7,0,0,0,0], [6,0,0,1,9,5,0,0,0], ...]`, 
-    please parse this into a valid prolog list term and output it in the List variable.
-    Do not use 0 for blank fields, instead use an underscore to denote a blank field.").
-
-format_solved_grid(SolvedGrid, MarkdownGrid) :-
-    @("Take the `SolvedGrid`, which is a list of lists of numbers (1-9), and format it into a clean, 
-    human-readable markdown table representing the Sudoku board. Add separators for the 3x3 blocks. 
-    The output `MarkdownGrid` should be a single markdown string.").
-
-find_online_solvers(SearchResults, SolverLinksSummary) :-
-    @("Analyze the `SearchResults` for 'online sudoku solver from image'. Extract the top 2 most promising URLs that lead to a tool where 
-    a user can upload an image to solve a Sudoku. Format the output as a markdown bulleted list string in `SolverLinksSummary`.").
-
-% Sudoku solver using Constraint Logic Programming over Finite Domains (CLP(FD))
-% This is a standard, well-known Prolog implementation for solving Sudoku.
-sudoku(Rows) :-
-    % Ensure the grid is 9x9
-    length(Rows, 9),
-    maplist(same_length(Rows), Rows),
-    % Flatten the grid into a single list of variables
-    append(Rows, Vs),
-    % The domain for each variable is 1 to 9
-    Vs ins 1..9,
-    % All numbers in each row must be unique
-    maplist(all_distinct, Rows),
-    % Transpose the grid to get columns, and ensure they are also unique
-    transpose(Rows, Columns),
-    maplist(all_distinct, Columns),
-    % Define the 3x3 blocks and ensure they are unique
-    Rows = [A,B,C,D,E,F,G,H,I],
-    blocks(A, B, C),
-    blocks(D, E, F),
-    blocks(G, H, I),
-    % Find a valid assignment of numbers to the variables
-    maplist(labeling([ff]), Rows).
-
-% Helper for the solver: defines the 3x3 block constraint
-blocks([], [], []).
-blocks([N1,N2,N3|Ns1], [N4,N5,N6|Ns2], [N7,N8,N9|Ns3]) :-
-    all_distinct([N1,N2,N3,N4,N5,N6,N7,N8,N9]),
-    blocks(Ns1, Ns2, Ns3).
-
-% Main agent logic
-
-% Branch 1: Successful image recognition and solving
-agent_main :-
-    param("image_path:file", "The path to the image file containing the Sudoku puzzle.", ImagePath),
-    ( ImagePath \= "" -> true ; (log(error="The 'image_path' parameter is missing."), fail) ),
-    log(task="Attempting to solve Sudoku directly from the image: '{ImagePath}'."),
-
-    % Step 1: Use the visualizer tool to perform OCR and extract the grid
-    log(task="Analyzing image to extract the puzzle grid and numbers."),
-    tool(visualizer(ImagePath,"Identify the Sudoku grid. Perform 
-            Optical Character Recognition (OCR) on each cell. 
-            Represent the grid as a Prolog list of lists, where each inner list is a row. 
-            Use the integer 0 to represent empty cells. The output `SudokuGrid` must be in this 
-            format, for example: `[[5,3,0,0,7,0,0,0,0], [6,0,0,1,9,5,0,0,0], ...]`. 
-            If a valid 9x9 grid cannot be reliably extracted, then output nothing"), ToolOutput),
-
-    parse_sudoku_string_to_prolog(ToolOutput, UnsolvedGrid),
-    ( UnsolvedGrid \= [] ->
-         log(task="Successfully extracted the grid from the image.")\ 
-    ; 
-        (log(error="Could not recognize a valid Sudoku grid in the image."), fail) 
-    ),
-
-    yield("Grid = {UnsolvedGrid}"),
-
-    % Step 2: Solve the puzzle using the CLP(FD) solver
-    log(task="Solving the puzzle..."),
-    sudoku(UnsolvedGrid), % This predicate solves the grid by unifying the variables
-    log(task="Puzzle solved successfully."),
-
-    % Step 3: Format the solved grid into a markdown table
-    log(task="Formatting the solution for display."),
-    format_solved_grid(UnsolvedGrid, SolvedGridMarkdown),
-
-    end_thinking,
-    system("You are a helpful assistant that has just solved a Sudoku puzzle from an image for the user."),
-    observation("I have successfully analyzed the image, extracted the puzzle, and found the solution."),
-    observation(SolvedGridMarkdown),
-    chat("Please give me the solution to this Sudoku.").</code></pre>
-                    <div class="example-footer">
-                        <strong>Key Insight:</strong> Vision AI for perception, LLM for parsing/formatting, Prolog for solving.
-                    </div>
-                </div>
-
-               
-
-               
             </div>
+
+            <div class="reveal">
+                <h3 class="headline" style="font-size: 1.5rem; margin-bottom: 20px;">🧩 Sudoku Solver with OCR</h3>
+                <div class="terminalWindow" style="max-width: 100%;">
+                    <div class="terminalHeader"><span>sudoku_solver.dml</span></div>
+                    <div class="terminalBody"
+                        style="color: #d4d4d4; font-family: 'Fira Code', monospace; line-height: 1.5; font-size: 0.85rem;">
+                        <span style="color: #6a9955;">% Branch 1: Successful image recognition and solving</span>
+                        agent_main :-
+                        param(<span style="color: #ce9178;">"image_path:file"</span>, <span style="color: #ce9178;">"The
+                            path to the image file."</span>, ImagePath),
+                        log(task=<span style="color: #ce9178;">"Attempting to solve Sudoku directly from the
+                            image..."</span>),
+
+                        <span style="color: #6a9955;">% Step 1: Vision AI + OCR</span>
+                        tool(visualizer(ImagePath, <span style="color: #ce9178;">"Identify grid. Output as Prolog
+                            list."</span>), ToolOutput),
+                        parse_sudoku_string_to_prolog(ToolOutput, UnsolvedGrid),
+
+                        <span style="color: #6a9955;">% Step 2: Solve using CLP(FD) constraint solver</span>
+                        ( UnsolvedGrid \= [] ->
+                        sudoku(UnsolvedGrid), <span style="color: #6a9955;">% Prolog constraint solving</span>
+                        format_solved_grid(UnsolvedGrid, MkDn),
+                        observation(MkDn)
+                        ;
+                        log(error=<span style="color: #ce9178;">"Could not recognize grid."</span>), fail
+                        ).
+                    </div>
+                </div>
+            </div>
+
         </div>
     </section>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <h4>DeepClause</h4>
-                    <p>The Missing Logic Agent</p>
-                    <p class="footer-tagline">Bridging symbolic reasoning and neural intelligence</p>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Resources</h4>
-                    <ul>
-                        <li><a href="https://github.com/deepclause/deepclause-desktop" target="_blank">GitHub Repository</a></li>
-                        <li><a href="https://github.com/deepclause/deepclause-desktop/issues" target="_blank">Issues & Support</a></li>
-                    </ul>
-                </div>
-                
-                <div class="footer-section">
-                    <h4>Contact</h4>
-                    <ul>
-                        <li>Email: support (at) deepclause.ai</li>
-                        <li><a href="https://github.com/deepclause/deepclause-desktop">GitHub Repository</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2025 DeepClause. ISC License.</p>
-                <p class="footer-credits">Built with ❤️ for the neurosymbolic AI community</p>
+            <p>&copy; 2025 DeepClause. Built for the neurosymbolic AI community.</p>
+            <div style="margin-top: 20px; opacity: 0.7; font-size: 0.9rem;">
+                <a href="https://github.com/deepclause/deepclause-desktop" target="_blank"
+                    style="margin: 0 10px;">GitHub</a> |
+                <a href="mailto:support@deepclause.ai" style="margin: 0 10px;">Contact</a>
             </div>
         </div>
     </footer>
 
     <script src="script.js"></script>
 </body>
+
 </html>
