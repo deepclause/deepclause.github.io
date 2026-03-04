@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static taint analysis for LLM agents - DeepClause Blog</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Styles (going up one level to root) -->
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        .blog-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 24px 120px 24px;
+        }
+
+        .blog-header {
+            margin-bottom: 40px;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 20px;
+        }
+
+        .blog-title {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .blog-meta {
+            font-family: var(--font-mono);
+            opacity: 0.6;
+            font-size: 0.9rem;
+        }
+
+        .blog-content {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+
+        .blog-content h1,
+        .blog-content h2,
+        .blog-content h3 {
+            font-family: var(--font-mono);
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        .blog-content p {
+            margin-bottom: 20px;
+        }
+
+        .blog-content pre {
+            background: #1e1e1e;
+            color: #eee;
+            padding: 16px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin-bottom: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+        }
+
+        .blog-content code {
+            background: var(--color-surface);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9em;
+        }
+
+        .blog-content pre code {
+            background: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        .blog-content a {
+            color: var(--color-accent);
+            text-decoration: underline;
+        }
+
+        .blog-content blockquote {
+            border-left: 4px solid var(--color-accent);
+            padding-left: 16px;
+            margin-left: 0;
+            color: rgba(17, 17, 17, 0.7);
+        }
+    </style>
+
+    <!-- KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css"
+        integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71bZl5O/6" crossorigin="anonymous">
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"
+        integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfPe41llsrCG4w"
+        crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"
+        integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbOxyj0O15TC4aKnfwG/gQA5A" crossorigin="anonymous"
+        onload="renderMathInElement(document.body, {
+            delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '\\[', right: '\\]', display: true},
+                {left: '\\(', right: '\\)', display: false}
+            ],
+            throwOnError: false
+        });"></script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+            <a href="../index.html" class="logo">
+                <span style="font-family: var(--font-mono); font-weight: 700;">deepclause.ai</span>
+            </a>
+            <nav class="nav">
+                <a href="../index.html#research">Research</a>
+                <a href="../index.html#solutions">Solutions</a>
+                <a href="index.html">Blog</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="blog-container">
+        <article>
+            <header class="blog-header">
+                <h1 class="blog-title">Static taint analysis for LLM agents</h1>
+                <div class="blog-meta">2026-03-02</div>
+            </header>
+
+            <div class="blog-content">
+                <h2>The DeepClause Approach</h2>
+<p>This is the same class of problem that Google’s <a href="https://arxiv.org/abs/2503.18813">CaMeL paper</a> (Debenedetti et al., 2025) tackles with runtime taint tracking: they wrap a protective layer around the LLM that separates control flow from data flow, preventing untrusted content from influencing program behavior. It’s a good approach. But because DML compiles to a real language with formal semantics, we can do something complementary: catch these flows statically using taint analysis. This can be done at compile time, before the agent ever runs.</p>
+<p>This post explains how that works.</p>
+<h2>Source-Sink Tracking</h2>
+<p>The idea behind taint analysis is borrowed from traditional security research (SQL injection, XSS — same family of bugs). You identify sources (places where untrusted data enters the system) and sinks (places where that data can cause harm). Then you track whether tainted data can flow from any source to any sink.</p>
+<p>In DeepClause, <strong>sources</strong> are:</p>
+<ul>
+<li><code>param/2</code> — parameters passed in from outside</li>
+<li><code>input/2</code> — direct user input</li>
+<li><code>user/1</code> — user messages added to memory</li>
+<li>Task outputs — anything an LLM generates (yes, LLM output is untrusted too)</li>
+<li>Tool and agent arguments — data flowing through <code>exec/2</code></li>
+</ul>
+<p>And <strong>sinks</strong> are:</p>
+<ul>
+<li><code>system/1</code> — the system prompt (severity: high). Tainted data here means prompt injection.</li>
+<li><code>exec/2</code> with dangerous tools — executing code via <code>vm_exec</code>, <code>shell_exec</code>, or <code>eval</code> (severity: critical). Tainted data here means command injection.</li>
+<li><code>task/N</code> memory — when a task inherits tainted conversation history (severity: medium). More subtle, but still a vector.</li>
+</ul>
+<p>The analyzer walks through every clause in your DML program and builds a map of which variables are tainted and how they flow.</p>
+<h2>Implementing This in Prolog</h2>
+<p>The nice thing about DML being Prolog is that the analyzer is also Prolog — and Prolog turns out to be unusually well-suited for this kind of work. Taint propagation is just pattern matching over terms: if a <code>format/3</code> call contains a tainted variable, its output variable is tainted. If an assignment <code>X = Y</code> has a tainted right-hand side, X is tainted. If a <code>string_concat</code> involves a tainted argument, the result is tainted. Each of these rules is a single Prolog clause. </p>
+<p>The analyzer applies them in a fixed-point loop — keep propagating until nothing new gets tainted — which handles multi-hop chains automatically.</p>
+<p>What makes this particularly clean is that Prolog’s backtracking gives you exhaustive search for free. The analyzer doesn’t need to manually enumerate paths — it defines what a vulnerability looks like (tainted variable reaching a sink), and Prolog finds every instance. </p>
+<p>Prolog itself does not have global variables, therefore the DeepClause meta-interpreter has to track the LLM memory across the execution. This lets us extend the analyzer to catch implicit taint through memory. When <code>user(UserMsg)</code> adds untrusted input to the conversation history and a subsequent <code>task()</code> inherits that history, the analyzer flags it as a medium-severity risk — the LLM will see the tainted message in its context.</p>
+<h2>Two Layers of Defense</h2>
+<p>Static analysis catches the obvious stuff at compile time. But some vulnerabilities only make sense in context — is this tool supposed to have access to user data? Is this system prompt intentionally parameterized?</p>
+<p>So DeepClause also has an LLM-based audit layer. After the static analyzer runs, you can optionally pass its findings to a language model configured as a “senior security engineer.”</p>
+<pre><code class="language-javascript">const result = await compileToDML(source, { 
+    analyze: true, // Run static analysis 
+    audit: true, // Run LLM security audit 
+    model: &#39;gpt-4o&#39;, 
+    provider: &#39;openai&#39; 
+}); 
+
+if (result.analysis?.warnings.length) { 
+    console.log(&#39;Security warnings:&#39;, result.analysis.warnings); 
+} 
+if (result.analysis?.auditorReport) { 
+    console.log(&#39;Audit report:&#39;, result.analysis.auditorReport); 
+}
+</code></pre>
+<p>Two different tools for two different jobs. Prolog handles the data flow analysis — deterministic, exhaustive. The LLM handles the contextual judgment. They complement each other nicely.</p>
+<h2>What’s Next</h2>
+<p>The analyzer is still young. There are things I want to add:</p>
+<ul>
+<li>Inter-procedural analysis: Right now each clause is analyzed independently. Tracking taint across predicate calls would catch more complex flows.</li>
+<li>Sanitization detection: If you explicitly validate or sanitize input before using it, the analyzer should recognize that and suppress the warning.</li>
+<li>Configurable policies: Different agents have different threat models. A public-facing chatbot needs stricter checks than an internal automation tool.</li>
+</ul>
+<p>If you want to try it, the analysis runs automatically when you compile with the <code>--analyze</code> flag:</p>
+<pre><code class="language-bash">deepclause compile my-agent.md --analyze
+</code></pre>
+<p>Or programmatically:</p>
+<pre><code class="language-javascript">import { analyzeDML } from &#39;deepclause-sdk&#39;; 
+
+const result = await analyzeDML(dmlCode); 
+for (const warning of result.warnings) { 
+    console.log(`[${warning.level.toUpperCase()}] ${warning.message}`); 
+}
+</code></pre>
+<p>The code is open source. The analyzer is ~200 lines of Prolog. If you find a taint flow it misses, I’d genuinely love to hear about it.</p>
+<hr>
+<h3>LaTeX Test Section</h3>
+<p>Here is a block math equation to test KaTeX rendering:</p>
+<p>$$
+\mathcal{L}(\theta) = -\frac{1}{N} \sum_{i=1}^{N} \log p_\theta(y_i | x_i)
+$$</p>
+<p>And an inline equation: \( E = mc^2 \).</p>
+
+            </div>
+        </article>
+
+        <div style="margin-top: 60px;">
+            <a href="index.html" style="font-weight: 700; color: var(--color-accent);">← Back to Blog</a>
+        </div>
+    </main>
+
+</body>
+
+</html>
