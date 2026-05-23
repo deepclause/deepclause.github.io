@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Current DML language reference for DeepClause: entry points, task and prompt predicates, tool wrappers, exec, params, memory, control flow, and helper files.">
+    <title>DeepClause DML Language Reference</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../deepclause.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Docs</a>
+                <a href="#entry-points">Entry Points</a>
+                <a href="#llm-predicates">LLM Predicates</a>
+                <a href="#exec-and-tools">Exec and Tools</a>
+                <a href="#params-and-directives">Params</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <section class="doc-hero">
+            <div class="container reveal">
+                <div class="breadcrumb">
+                    <a href="../index.html">Home</a>
+                    <span>/</span>
+                    <a href="index.html">Docs</a>
+                    <span>/</span>
+                    <a href="dml-language-reference.html">DML Language Reference</a>
+                </div>
+                <p class="eyebrow">Reference</p>
+                <h1>DML language reference for the current runtime.</h1>
+                <p>
+                    DML is a Prolog-style language for agent workflows. It combines declarative logic, backtracking,
+                    recursion, direct tool execution, and LLM-driven subtasks. This page reflects the current runtime behavior,
+                    including the modern task harness and task-loop semantics.
+                </p>
+                <div class="doc-actions">
+                    <a class="button button-primary" href="index.html">Back to docs</a>
+                    <a class="button button-secondary" href="https://github.com/deepclause/deepclause-sdk/tree/main/dml-examples" target="_blank" rel="noreferrer">Examples on GitHub</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="container doc-layout">
+            <div class="doc-main">
+                <section id="at-a-glance" class="doc-section reveal">
+                    <span class="section-kicker">At a Glance</span>
+                    <h2>What DML is for</h2>
+                    <p class="section-intro">
+                        Use DML when the workflow itself matters: retries, fallback clauses, recursion, explicit tool routing,
+                        helper predicates, and a clear separation between deterministic logic and open-ended model calls.
+                    </p>
+
+                    <div class="stat-grid">
+                        <article class="stat-card">
+                            <strong>Logic</strong>
+                            <p>Normal Prolog-style clauses, unification, backtracking, cuts, and recursion.</p>
+                        </article>
+                        <article class="stat-card">
+                            <strong>LLM calls</strong>
+                            <p><code>task()</code> and <code>prompt()</code> support typed outputs and tool use.</p>
+                        </article>
+                        <article class="stat-card">
+                            <strong>Tooling</strong>
+                            <p><code>exec()</code> calls runtime and MCP tools directly, while tool wrappers expose capabilities to the model loop.</p>
+                        </article>
+                        <article class="stat-card">
+                            <strong>Control</strong>
+                            <p>Use helper files, scoped tools, params, memory operations, and standard SWI libraries.</p>
+                        </article>
+                    </div>
+                </section>
+
+                <section id="entry-points" class="doc-section reveal">
+                    <span class="section-kicker">Entry Points</span>
+                    <h2><code>agent_main</code> is required</h2>
+                    <p>
+                        Every DML program needs at least one <code>agent_main</code> clause. The current runtime dispatches
+                        <code>agent_main/0</code> through <code>agent_main/3</code>. If the provided argument count does not match exactly,
+                        the runtime falls back to the best available arity and leaves missing positions unbound.
+                    </p>
+
+                    <pre><code>% No arguments
+agent_main :-
+    answer("Ready.").
+
+% One positional argument
+agent_main(Topic) :-
+    answer(Topic).
+
+% Up to three positional arguments
+agent_main(Topic, Mode, Limit) :-
+    answer("Running").</code></pre>
+
+                    <ul class="feature-list">
+                        <li>CLI positional arguments arrive as strings.</li>
+                        <li>SDK <code>runDML()</code> can pass structured values such as numbers, booleans, lists, and dict-like objects, which are serialized into Prolog terms.</li>
+                        <li>Use named params for optional settings instead of packing too many meaning changes into positional args.</li>
+                    </ul>
+
+                    <div class="callout">
+                        <strong>Parsing text arguments</strong>
+                        If a CLI skill needs numeric input, parse it explicitly with predicates such as <code>number_string/2</code> or <code>atom_number/2</code>.
+                    </div>
+                </section>
+
+                <section id="llm-predicates" class="doc-section reveal">
+                    <span class="section-kicker">LLM Predicates</span>
+                    <h2><code>task()</code> uses memory, <code>prompt()</code> starts fresh</h2>
+                    <p>
+                        <code>task()</code> and <code>prompt()</code> are the core model-facing predicates. They share the same task harness and tool mechanism,
+                        but differ in memory behavior.
+                    </p>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Predicate</th>
+                                    <th>Behavior</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>task(Description)</code></td>
+                                    <td>Run a subtask using accumulated memory from <code>system()</code>, <code>user()</code>, and earlier task history.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>task(Description, Var1[, Var2, Var3])</code></td>
+                                    <td>Run a subtask and return up to three outputs through typed or untyped output variables.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>prompt(Description)</code></td>
+                                    <td>Run a model call with fresh memory and no prior conversation context.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>prompt(Description, Var1[, Var2, Var3])</code></td>
+                                    <td>Fresh-memory variant with typed or untyped outputs.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>system(Text)</code></td>
+                                    <td>Add a system instruction or persona to the current memory.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>user(Text)</code></td>
+                                    <td>Add a user turn to the current memory.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Typed outputs</h3>
+                    <p>Typed wrappers let the runtime validate the model output before returning it to the clause.</p>
+                    <pre><code>task("Return the issue count.", integer(IssueCount)).
+task("Return true or false only.", boolean(IsValid)).
+task("List the file paths.", list(string(Paths))).
+task("Return a JSON object with summary and severity.", object(Report)).
+task("Return a floating-point score.", number(Score)).</code></pre>
+
+                    <ul class="feature-list">
+                        <li>Supported wrappers include <code>string()</code>, <code>integer()</code>, <code>number()</code>, <code>float()</code>, <code>boolean()</code>, <code>list(...)</code>, and <code>object()</code>.</li>
+                        <li>Describe expected outputs plainly in the prompt text. The harness is more reliable when the prompt names the outputs and required format directly.</li>
+                        <li>Prefer <code>prompt()</code> for independent critiques, classification passes, or fresh reasoning that should not inherit earlier context.</li>
+                    </ul>
+
+                    <h3>Memory isolation example</h3>
+                    <pre><code>agent_main(Topic) :-
+    system("You are a researcher."),
+    task("Research {Topic} and produce a draft.", Draft),
+    prompt("Critique this draft from a skeptical perspective: {Draft}", Critique),
+    task("Revise the draft using this critique: {Critique}", Final),
+    answer(Final).</code></pre>
+                </section>
+
+                <section id="task-loop-semantics" class="doc-section reveal">
+                    <span class="section-kicker">Task Loop Semantics</span>
+                    <h2>Tool wrappers are for the model loop, not ordinary predicate calls</h2>
+                    <p>
+                        DML tool wrappers expose capabilities that the model can decide to call while executing <code>task()</code> or <code>prompt()</code>.
+                        They are not regular predicates that you invoke directly from ordinary DML control flow.
+                    </p>
+
+                    <pre><code>tool(search(Query, Results), "Search the web") :-
+    exec(web_search(query: Query), Results).
+
+tool(explain_sum(A, B, Explanation), "Calculate and explain a sum") :-
+    Total is A + B,
+    format(string(Desc), "Explain why ~w + ~w = ~w", [A, B, Total]),
+    task(Desc, Explanation).</code></pre>
+
+                    <div class="callout">
+                        <strong>Core built-ins inside the task loop</strong>
+                        The current runtime injects <code>finish(success)</code> and <code>set_result(variable, value)</code> into the task loop.
+                        If the task declares output variables, the model must set them before <code>finish(true)</code> succeeds.
+                    </div>
+
+                    <ul class="feature-list">
+                        <li>Nested <code>task()</code> or <code>prompt()</code> calls inside a tool run with fresh memory, not the parent task memory.</li>
+                        <li>The currently executing tool is hidden from the nested task loop to prevent immediate self-recursion.</li>
+                        <li>Use <code>with_tools(ToolList, Goal)</code> and <code>without_tools(ToolList, Goal)</code> to narrow the available tool set for a nested model call.</li>
+                    </ul>
+
+                    <pre><code>tool(safe_research(Topic, Result), "Research using only the search tool") :-
+    with_tools([search], (
+        format(string(Desc), "Research ~w and summarize the results", [Topic]),
+        task(Desc, Result)
+    )).
+
+tool(cheap_pass(Input, Output), "Run a cheaper pass without expensive tools") :-
+    without_tools([expensive_api], (
+        format(string(Desc), "Process this input conservatively: ~w", [Input]),
+        prompt(Desc, Output)
+    )).</code></pre>
+                </section>
+
+                <section id="exec-and-tools" class="doc-section reveal">
+                    <span class="section-kicker">Exec and Tools</span>
+                    <h2><code>exec()</code> is the direct path to runtime and MCP tools</h2>
+                    <p>
+                        Use <code>exec(ToolCall, Result)</code> when the step is deterministic or external by nature: shell commands,
+                        HTTP fetches, search calls, browser steps, or runtime-specific orchestration helpers.
+                    </p>
+
+                    <pre><code>exec(web_search(query: "latest AI news"), SearchResult).
+exec(url_fetch(url: "https://example.com", save_to: "notes/example.html"), FetchResult).
+exec(vm_exec(command: "git status --short"), ShellResult),
+get_dict(stdout, ShellResult, StatusText).</code></pre>
+
+                    <h3>Common runtime tools</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Tool</th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>web_search</code></td>
+                                    <td>Search the web through the configured runtime provider.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>news_search</code></td>
+                                    <td>Search recent news results.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>url_fetch</code></td>
+                                    <td>Fetch a page and optionally save it into the workspace.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>bash</code></td>
+                                    <td>Run a shell command in the active workspace.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>vm_exec</code></td>
+                                    <td>Alias of <code>bash</code>; with <code>--sandbox</code>, execution happens in AgentVM.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <ul class="feature-list">
+                        <li>Other tools can be runtime-role specific. The conductor and skill creator each add their own higher-level exec tools.</li>
+                        <li>MCP servers can add more tools without changing the DML language itself.</li>
+                        <li>Shell tools run in the configured workspace. In sandbox mode the workspace is mounted at <code>/workspace</code>.</li>
+                    </ul>
+
+                    <h3>Handling structured results</h3>
+                    <pre><code>exec(vm_exec(command: "echo '{\"ok\": true}'"), ShellResult),
+get_dict(stdout, ShellResult, Stdout),
+atom_json_dict(Stdout, Data, []),
+get_dict(ok, Data, IsOk).</code></pre>
+
+                    <p>
+                        Most runtime tools return dict-like structures. Use <code>get_dict/3</code> for field access and <code>atom_json_dict/3</code>
+                        when a tool emits JSON text that you want to parse back into a dict.
+                    </p>
+                </section>
+
+                <section id="memory-and-control" class="doc-section reveal">
+                    <span class="section-kicker">Memory and Control</span>
+                    <h2>Backtracking and explicit memory control are first-class</h2>
+                    <p>
+                        DML keeps the normal Prolog model: clauses can fail, the runtime backtracks to alternatives, and memory is restored with the choice point.
+                        That makes fallback workflows natural instead of bolted on.
+                    </p>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Predicate</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>output(Text)</code> / <code>yield(Text)</code></td>
+                                    <td>Emit progress output without ending the run.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>log(Text)</code></td>
+                                    <td>Emit a debug-style log message.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>answer(Text)</code></td>
+                                    <td>Emit the final answer and commit execution.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>push_context</code>, <code>push_context(clear)</code>, <code>pop_context</code></td>
+                                    <td>Save and restore memory manually when you want local isolation inside a clause.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>clear_memory</code></td>
+                                    <td>Clear accumulated model memory.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Fallback via multiple clauses</h3>
+                    <pre><code>agent_main(Question) :-
+    system("Answer concisely."),
+    task("Answer this question: {Question}", Draft),
+    validate_answer(Draft),
+    answer(Draft).
+
+agent_main(Question) :-
+    system("Use a more thorough approach."),
+    task("Research this question carefully: {Question}", Final),
+    answer(Final).</code></pre>
+
+                    <h3>Recursion and list processing</h3>
+                    <pre><code>process_files([]).
+process_files([File|Rest]) :-
+    task("Review this file: {File}"),
+    process_files(Rest).
+
+agent_main(Files) :-
+    process_files(Files),
+    answer("All files processed.").</code></pre>
+
+                    <p>
+                        Normal Prolog constructs such as <code>fail</code>, <code>true</code>, disjunction, if-then-else, list decomposition,
+                        arithmetic with <code>is/2</code>, and cuts remain available.
+                    </p>
+                </section>
+
+                <section id="params-and-directives" class="doc-section reveal">
+                    <span class="section-kicker">Params and Directives</span>
+                    <h2>Named parameters, interpolation, and helper file loading</h2>
+                    <p>
+                        DML supports named runtime parameters, compile-time string interpolation, and workspace-relative helper loading.
+                        These features are what make larger skills maintainable.
+                    </p>
+
+                    <h3>Named params</h3>
+                    <pre><code>agent_main :-
+    param(system_prompt, SystemPrompt),
+    param(mode, "Requested execution mode", Mode),
+    system(SystemPrompt),
+    answer(Mode).</code></pre>
+
+                    <ul class="feature-list">
+                        <li><code>param(Key, Value)</code> looks up a named parameter passed at runtime.</li>
+                        <li><code>param(Key, Description, Value)</code> is the self-documented form used by system skills and tooling.</li>
+                        <li>Named params are especially useful for configuration-like inputs that should not occupy positional <code>agent_main</code> arguments.</li>
+                    </ul>
+
+                    <h3>Parameter declaration directives</h3>
+                    <pre><code>:- param(system_prompt, "Optional system prompt override").
+:- param(limit, "Maximum result count", 10).</code></pre>
+
+                    <p>
+                        These directives let a skill declare expected named parameters for documentation and tooling purposes.
+                        Runtime lookups still happen through <code>param/2</code> or <code>param/3</code> inside executable clauses.
+                    </p>
+
+                    <h3>String interpolation</h3>
+                    <pre><code>task("Summarize the findings for {Topic}", Summary).
+output("Processed {Count} files successfully.").</code></pre>
+
+                    <p>
+                        Quoted strings support <code>{Var}</code> interpolation against bound variables. Use <code>format(string(...), ...)</code>
+                        when you need precise formatting or want to build strings incrementally from non-string terms.
+                    </p>
+
+                    <h3>Libraries and helper files</h3>
+                    <pre><code>:- use_module(library(lists)).
+:- use_module(library(clpfd)).
+:- consult('.deepclause/tools/my-skill/helpers/search_helpers.dml').</code></pre>
+
+                    <ul class="feature-list">
+                        <li>Use <code>:- use_module(library(...)).</code> for standard SWI-Prolog libraries such as <code>lists</code>, <code>clpfd</code>, <code>clpq</code>, and <code>clpr</code>.</li>
+                        <li>Use <code>:- consult('relative/path.dml').</code> for workspace-local helper predicates.</li>
+                        <li>Local <code>:- use_module('path/to/helper.dml').</code> also works today, but it behaves more like consult-style loading than strict SWI export filtering.</li>
+                        <li>Keep non-DML helper assets, scripts, and per-skill virtual environments under <code>.deepclause/tools/lib/&lt;name&gt;/</code>. Keep consulted <code>.dml</code> helpers wherever the skill structure stays clearest.</li>
+                    </ul>
+                </section>
+
+                <section id="best-practices" class="doc-section reveal">
+                    <span class="section-kicker">Best Practices</span>
+                    <h2>Write smaller, more explicit skills</h2>
+
+                    <ul class="feature-list">
+                        <li>Use ordinary Prolog and <code>exec()</code> for deterministic work such as parsing, arithmetic, file I/O, or branching on exact values.</li>
+                        <li>Use <code>task()</code> and <code>prompt()</code> only where open-ended reasoning or generation is genuinely needed.</li>
+                        <li>Move reusable logic into helper predicates or helper files rather than growing one giant <code>agent_main</code> clause.</li>
+                        <li>Prefer scoped tool exposure for nested model calls so the model only sees the tools relevant to that local step.</li>
+                        <li>Be explicit about output variables in prompt text. Smaller models behave better when the prompt states exactly what result names and formats are expected.</li>
+                    </ul>
+
+                    <div class="section-divider"></div>
+
+                    <h3>Common mistakes</h3>
+                    <ul class="compact-list">
+                        <li>Treating a tool wrapper like a normal predicate call. Use <code>exec()</code> directly or let the model call the wrapper during <code>task()</code> or <code>prompt()</code>.</li>
+                        <li>Assuming nested <code>task()</code> calls inherit the parent memory. They do not.</li>
+                        <li>Forgetting that output variables in a task loop must be set through <code>set_result</code> before <code>finish(true)</code>.</li>
+                        <li>Overloading positional arguments when a named param would be easier to read and safer to evolve.</li>
+                        <li>Using the model for logic that could be encoded directly as a deterministic predicate.</li>
+                    </ul>
+                </section>
+            </div>
+
+            <aside class="doc-toc reveal">
+                <section class="toc-card">
+                    <h2>On this page</h2>
+                    <ul class="toc-list">
+                        <li><a href="#at-a-glance">At a glance</a></li>
+                        <li><a href="#entry-points">Entry points</a></li>
+                        <li><a href="#llm-predicates">LLM predicates</a></li>
+                        <li><a href="#task-loop-semantics">Task loop semantics</a></li>
+                        <li><a href="#exec-and-tools">Exec and tools</a></li>
+                        <li><a href="#memory-and-control">Memory and control</a></li>
+                        <li><a href="#params-and-directives">Params and directives</a></li>
+                        <li><a href="#best-practices">Best practices</a></li>
+                    </ul>
+                </section>
+                <section class="doc-note">
+                    <h3>Important current behavior</h3>
+                    <p>
+                        The core built-ins in the task harness are <code>finish</code> and <code>set_result</code>.
+                        This page intentionally tracks the actual runtime rather than older prompt text that used earlier terminology.
+                    </p>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Logic-first agents with a local CLI runtime and fullscreen TUI coding agent.</p>
+            </div>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

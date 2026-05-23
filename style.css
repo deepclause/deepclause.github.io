@@ -338,6 +338,10 @@ code {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.four-up {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
 .info-card,
 .info-panel,
 .mini-note,
@@ -489,6 +493,7 @@ code {
   .hero-grid,
   .two-column,
   .screenshot-layout,
+  .four-up,
   .three-up {
     grid-template-columns: 1fr;
   }

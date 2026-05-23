@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DeepClause documentation covering the runtime model, fullscreen TUI, CLI, SDK, system assets, and DML language surface.">
+    <title>DeepClause Docs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../deepclause.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="#overview">Overview</a>
+                <a href="#tui">TUI</a>
+                <a href="#cli-sdk">CLI and SDK</a>
+                <a href="examples.html">Examples</a>
+                <a href="dml-language-reference.html">DML Reference</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <section class="doc-hero">
+            <div class="container reveal">
+                <div class="breadcrumb">
+                    <a href="../index.html">Home</a>
+                    <span>/</span>
+                    <a href="index.html">Docs</a>
+                </div>
+                <p class="eyebrow">Documentation</p>
+                <h1>DeepClause runtime, tools, and language docs.</h1>
+                <p>
+                    DeepClause is a local-first agent system that compiles Markdown specs into DML,
+                    runs them in a Prolog-based runtime, and wraps that execution model with a fullscreen
+                    conductor TUI, a CLI, an embeddable SDK, editable system assets, and extensible tool routing.
+                </p>
+                <div class="doc-actions">
+                    <a class="button button-primary" href="examples.html">Browse examples</a>
+                    <a class="button button-secondary" href="sdk-api-reference.html">SDK API reference</a>
+                    <a class="button button-primary" href="dml-language-reference.html">Read the DML reference</a>
+                    <a class="button button-secondary" href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">Browse the repo</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="container doc-layout">
+            <div class="doc-main">
+                <section id="overview" class="doc-section reveal">
+                    <span class="section-kicker">Overview</span>
+                    <h2>What DeepClause ships today</h2>
+                    <p class="section-intro">
+                        DeepClause separates orchestration, execution, and guidance into distinct surfaces.
+                        The conductor owns the conversation, compiled skills do the work, recipes provide reusable workflow guidance,
+                        and the runtime stays inspectable through local files, execution logs, and editable prompt assets.
+                    </p>
+
+                    <div class="stat-grid">
+                        <article class="stat-card">
+                            <strong>Markdown -> DML</strong>
+                            <p>Compile natural-language specs into executable Prolog-style workflows with retries, branching, and tool use.</p>
+                        </article>
+                        <article class="stat-card">
+                            <strong>Local-first runtime</strong>
+                            <p>Run against the host shell by default or switch shell execution into AgentVM with <code>--sandbox</code>.</p>
+                        </article>
+                        <article class="stat-card">
+                            <strong>Editable system assets</strong>
+                            <p>Override the conductor prompt, compiler prompt, and task harness from <code>.deepclause/system/</code>.</p>
+                        </article>
+                        <article class="stat-card">
+                            <strong>Observable sessions</strong>
+                            <p>Keep per-session transcripts, execution logs, usage counters, recipes, and compacted memory on disk.</p>
+                        </article>
+                    </div>
+
+                    <h3>Feature surface</h3>
+                    <ul class="feature-list">
+                        <li><code>deepclause init</code> seeds <code>.deepclause/config.json</code>, local tool folders, docs, system overrides, recipes, and default skills.</li>
+                        <li><code>.deepclause/system/TASK_PROMPT.md</code> now controls the task and prompt harness used during execution, not just the packaged default.</li>
+                        <li><code>.deepclause/system/DML_COMPILER_PROMPT.md</code> and <code>.deepclause/system/CONDUCTOR_PROMPT.md</code> let you tune compile-time and conductor behavior locally.</li>
+                        <li>The skill creator can generate helper assets under <code>.deepclause/tools/lib/&lt;skill-or-tool-name&gt;/</code>, including per-skill <code>.venv</code> environments when Python helpers are needed.</li>
+                        <li>Runtime shell execution can stay on the host or move into AgentVM; host isolation backends include clean-room, <code>bwrap</code>, and <code>sandbox-exec</code> when supported.</li>
+                        <li>DeepClause can use built-in runtime tools and MCP-exposed tools. <code>deepclause list-tools</code> shows the resolved set.</li>
+                        <li>Session and loop compaction are configurable with ordinary DML compactors bound to runtime hook points.</li>
+                        <li>Recipes live in <code>.deepclause/system/recipes/</code> as searchable workflow guidance instead of executable worker code.</li>
+                        <li>The conductor can answer directly, call local skills, consult recipes, create new skills, run shell tools, and delegate to research-oriented workers.</li>
+                    </ul>
+
+                    <h3>Workspace layout</h3>
+                    <pre><code>.deepclause/
+  config.json
+  docs/
+    TUI.md
+  sessions/
+    &lt;session-id&gt;/
+  system/
+    CONDUCTOR_PROMPT.md
+    DML_COMPILER_PROMPT.md
+    TASK_PROMPT.md
+    conductor.dml
+    skill-creator.dml
+    recipes/
+  tools/
+    my-skill.dml
+    lib/
+      my-skill/
+        .venv/
+        helper.py</code></pre>
+
+                    <div class="callout">
+                        <strong>Operational model</strong>
+                        Compile-time behavior, the conductor, and task-level prompting are all editable as workspace files.
+                        The intended workflow is not to treat the runtime as a black box, but to version those files alongside your project.
+                    </div>
+                </section>
+
+                <section id="tui" class="doc-section reveal">
+                    <span class="section-kicker">TUI</span>
+                    <h2>The fullscreen conductor interface</h2>
+                    <p class="section-intro">
+                        Running <code>deepclause</code> with no subcommand launches the fullscreen TUI. The left pane shows sessions,
+                        the center pane holds the conversation, and the right side shows execution activity plus summarized context.
+                    </p>
+
+                    <div class="split-grid">
+                        <figure class="doc-image-frame">
+                            <img src="../tui.png" alt="DeepClause TUI screenshot">
+                            <figcaption>Session view with message history, execution log, and context panes.</figcaption>
+                        </figure>
+                        <div>
+                            <h3>What the conductor does</h3>
+                            <ul class="compact-list">
+                                <li>Loads the active session from <code>.deepclause/sessions/&lt;session-id&gt;/</code>.</li>
+                                <li>Builds a grounded system prompt from the conductor prompt, recipe library, session history, memory files, and skill catalog.</li>
+                                <li>Routes the turn to direct reasoning, an existing skill, a recipe-guided approach, or the skill creator.</li>
+                                <li>Streams child-skill activity into the execution pane and persists messages, usage, and execution logs back to disk.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Command bar inputs</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Input</th>
+                                    <th>Behavior</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>plain text</code></td>
+                                    <td>Sends a normal message to the conductor for the current session.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/new</code></td>
+                                    <td>Creates a fresh session.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/sessions</code></td>
+                                    <td>Shows or refreshes session navigation.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/compile &lt;spec&gt;</code></td>
+                                    <td>Compiles a Markdown specification into a local DML skill.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/skill-creator &lt;spec&gt;</code></td>
+                                    <td>Runs the built-in skill creator on a spec or edit request.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/&lt;skill&gt; [args]</code></td>
+                                    <td>Runs a compiled local skill directly from the TUI.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/set-model &lt;model&gt; [--slot &lt;slot&gt;]</code></td>
+                                    <td>Changes the model for all slots or just <code>gateway</code>, <code>run</code>, or <code>compile</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>!&lt;command&gt;</code></td>
+                                    <td>Runs an ephemeral shell command and streams output only into the execution pane.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>!!&lt;command&gt;</code></td>
+                                    <td>Runs the command and appends both the command and its output to the session transcript so the conductor can see it next turn.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/cancel</code></td>
+                                    <td>Cancels the active shell command or child execution when possible.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="callout">
+                        <strong>Use <code>!!</code> for shared shell state</strong>
+                        <code>!command</code> is a temporary escape hatch. <code>!!command</code> is for shell output that should become part of the conversation state and influence the next conductor turn.
+                    </div>
+
+                    <h3>Why the TUI matters</h3>
+                    <ul class="feature-list">
+                        <li>It keeps routing decisions in one place: the conductor, not a pile of disconnected prompts.</li>
+                        <li>It exposes execution logs and context summaries instead of hiding the runtime behind chat output alone.</li>
+                        <li>It works with the same session files and system assets as headless usage, so debugging a TUI turn and a CLI turn stays comparable.</li>
+                        <li>It is designed for local repo work: memory files, transcript files, recipes, and tools are all read from the workspace.</li>
+                    </ul>
+                </section>
+
+                <section id="cli-sdk" class="doc-section reveal">
+                    <span class="section-kicker">CLI and SDK</span>
+                    <h2>Headless runs, compiled skills, and embeddable execution</h2>
+                    <p class="section-intro">
+                        The CLI covers install, init, compile, run, tool introspection, model slot management, and headless conductor turns.
+                        The SDK exposes the same execution engine directly to TypeScript code.
+                    </p>
+
+                    <h3>Quick start</h3>
+                    <pre><code>npm install -g deepclause-sdk
+export OPENAI_API_KEY="sk-..."
+deepclause init --model openai:gpt-4o
+deepclause</code></pre>
+
+                    <h3>CLI reference</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Command</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>deepclause init</code></td>
+                                    <td>Seed <code>.deepclause/</code> and its default config, prompts, recipes, and skills.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>deepclause compile &lt;file.md&gt;</code></td>
+                                    <td>Compile one Markdown spec into DML with static analysis and LLM audit by default.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>deepclause compile-all &lt;dir&gt;</code></td>
+                                    <td>Compile every Markdown spec in a directory.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>deepclause run &lt;file.dml&gt; [args]</code></td>
+                                    <td>Execute a compiled skill directly.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>deepclause run -p &quot;...&quot;</code></td>
+                                    <td>Compile a one-shot prompt to DML and run it immediately.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>deepclause -p &quot;...&quot;</code></td>
+                                    <td>Run a single headless conductor turn with a fresh session.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>deepclause list-commands</code></td>
+                                    <td>List compiled local skills.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>deepclause list-tools</code></td>
+                                    <td>Show built-in runtime tools plus configured MCP tools.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>deepclause show-model</code></td>
+                                    <td>Display resolved <code>gateway</code>, <code>run</code>, and <code>compile</code> model slots.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>deepclause set-model &lt;model&gt;</code></td>
+                                    <td>Update all model slots or a single slot with <code>--slot</code>.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Configuration and runtime knobs</h3>
+                    <ul class="feature-list">
+                        <li><code>providers</code> configures OpenAI, Anthropic, Google, OpenRouter, or custom OpenAI-compatible endpoints.</li>
+                        <li>Three model slots separate conductor routing (<code>gateway</code>), worker execution (<code>run</code>), and compilation or skill creation (<code>compile</code>).</li>
+                        <li><code>shell.wrapper</code> chooses the host isolation backend and <code>shell.strictIsolation</code> requests a stricter host mode.</li>
+                        <li><code>agentvm.network</code> controls outbound network access when shell commands run with <code>--sandbox</code>.</li>
+                        <li><code>mcp.servers</code> registers external tool providers that become visible in <code>deepclause list-tools</code>.</li>
+                        <li><code>compaction.bindings</code> attaches DML compactors to hooks such as <code>before_user_message</code> and <code>before_model_call</code>.</li>
+                    </ul>
+
+                    <h3>SDK entry points</h3>
+                    <pre><code>import { createDeepClause } from 'deepclause-sdk';
+
+const dc = await createDeepClause({
+  model: 'gpt-4o',
+  apiKey: process.env.OPENAI_API_KEY,
+  streaming: true,
+});
+
+for await (const event of dc.runDML(code, {
+  args: ['report.md'],
+  params: { max_results: 5, mode: 'brief' },
+  workspacePath: process.cwd(),
+  initialMessages: [
+    { role: 'user', content: 'Use the repo conventions in memory.' },
+  ],
+})) {
+  console.log(event.type, event.content ?? '');
+}
+
+await dc.dispose();</code></pre>
+
+                    <div class="mini-grid">
+                        <article class="doc-note">
+                            <h3>Run options</h3>
+                            <p><code>runDML()</code> accepts positional <code>args</code>, named <code>params</code>, <code>workspacePath</code>, <code>gasLimit</code>, <code>initialMessages</code>, <code>compaction</code>, <code>onUserInput</code>, and <code>signal</code>.</p>
+                        </article>
+                        <article class="doc-note">
+                            <h3>Extensibility</h3>
+                            <p>The SDK can <code>registerTool()</code>, <code>setToolPolicy()</code>, <code>clearToolPolicy()</code>, inspect tools with <code>getTools()</code>, and introspect memory with <code>getMemory()</code>.</p>
+                        </article>
+                    </div>
+
+                    <h3>SDK event stream</h3>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event type</th>
+                                    <th>Meaning</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>output</code>, <code>stream</code>, <code>answer</code></td>
+                                    <td>Progress updates, streamed LLM text, and the final committed answer.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>tool_call</code></td>
+                                    <td>Lifecycle updates for an external tool call, including backend, pid, exit code, and result.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>usage</code></td>
+                                    <td>Token accounting for an LLM call.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>memory_compaction</code></td>
+                                    <td>Compaction hook activity, including whether the binding was applied, skipped, or failed.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>input_required</code>, <code>error</code>, <code>finished</code></td>
+                                    <td>User-input requests, runtime failures, and terminal completion metadata.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="link-list">
+                        <a href="examples.html">Open the examples guide</a>
+                        <a href="sdk-api-reference.html">Open the SDK API reference</a>
+                    </div>
+                </section>
+
+                <section id="examples-sdk-api" class="doc-section reveal">
+                    <span class="section-kicker">Examples and API</span>
+                    <h2>Use the docs in two modes</h2>
+                    <p class="section-intro">
+                        The docs landing page is now paired with a dedicated examples page and a type-shaped SDK API reference.
+                        Use the examples page when you want runnable commands and the API page when you want exact option and event surfaces.
+                    </p>
+
+                    <div class="docs-grid">
+                        <article class="doc-note">
+                            <h3>Examples guide</h3>
+                            <p>Validated commands for <code>sdk-examples/</code>, no-key smoke checks, and guidance on which sample to run first.</p>
+                            <div class="link-list">
+                                <a href="examples.html">Open examples</a>
+                            </div>
+                        </article>
+                        <article class="doc-note">
+                            <h3>SDK API reference</h3>
+                            <p>Constructor, methods, run options, compile options, tool contracts, compaction types, and event fields.</p>
+                            <div class="link-list">
+                                <a href="sdk-api-reference.html">Open SDK API reference</a>
+                            </div>
+                        </article>
+                    </div>
+                </section>
+
+                <section id="dml-language-reference" class="doc-section reveal">
+                    <span class="section-kicker">DML Language Reference</span>
+                    <h2>The language surface behind compiled skills</h2>
+                    <p class="section-intro">
+                        DML is a Prolog-flavored language for agent orchestration. It mixes normal logic programming
+                        with LLM calls, runtime tools, backtracking, recursion, and scoped tool exposure. The reference page below tracks the current runtime,
+                        including the modern task harness and the actual built-in task-loop tools.
+                    </p>
+
+                    <div class="docs-grid">
+                        <article class="doc-note">
+                            <h3>Entry points</h3>
+                            <p><code>agent_main</code> is the required entry point. The runtime dispatches arities <code>/0</code> through <code>/3</code>.</p>
+                        </article>
+                        <article class="doc-note">
+                            <h3>LLM calls</h3>
+                            <p><code>task()</code> uses accumulated memory. <code>prompt()</code> runs with fresh memory. Both support typed outputs.</p>
+                        </article>
+                        <article class="doc-note">
+                            <h3>Direct execution</h3>
+                            <p><code>exec()</code> calls built-in and MCP tools directly for deterministic work such as shell commands, fetches, and searches.</p>
+                        </article>
+                        <article class="doc-note">
+                            <h3>Task-loop tools</h3>
+                            <p>The core loop exposes <code>finish(success)</code> and <code>set_result(variable, value)</code>, plus any tool wrappers available in scope.</p>
+                        </article>
+                    </div>
+
+                    <pre><code>tool(search(Query, Results), "Search the web for information") :-
+    exec(web_search(query: Query), Results).
+
+agent_main(Topic) :-
+    system("You are a careful researcher."),
+    task("Research {Topic} and store a concise summary.", Summary),
+    prompt("Critique this summary: {Summary}", Critique),
+    answer(Critique).</code></pre>
+
+                    <div class="callout">
+                        <strong>Read the full reference</strong>
+                        The dedicated reference covers <code>agent_main</code>, <code>task</code>, <code>prompt</code>, <code>exec</code>, tool wrappers, <code>param</code>, interpolation,
+                        helper files, control flow, memory predicates, and common mistakes.
+                    </div>
+
+                    <div class="link-list">
+                        <a href="dml-language-reference.html">Open the DML language reference</a>
+                        <a href="https://github.com/deepclause/deepclause-sdk/tree/main/dml-examples" target="_blank" rel="noreferrer">Browse DML examples</a>
+                    </div>
+                </section>
+            </div>
+
+            <aside class="doc-toc reveal">
+                <section class="toc-card">
+                    <h2>On this page</h2>
+                    <ul class="toc-list">
+                        <li><a href="#overview">Overview</a></li>
+                        <li><a href="#tui">TUI</a></li>
+                        <li><a href="#cli-sdk">CLI and SDK</a></li>
+                        <li><a href="#examples-sdk-api">Examples and API</a></li>
+                        <li><a href="#dml-language-reference">DML Language Reference</a></li>
+                    </ul>
+                </section>
+                <section class="doc-note">
+                    <h3>Canonical sources</h3>
+                    <p>
+                        The docs here were aligned to the current SDK runtime, CLI help, seeded system assets,
+                        and task harness behavior rather than copied from the older DML reference file.
+                    </p>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Logic-first agents with a local CLI runtime and fullscreen TUI coding agent.</p>
+            </div>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="examples.html">Examples</a>
+                <a href="sdk-api-reference.html">SDK API</a>
+                <a href="dml-language-reference.html">DML Reference</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DeepClause SDK API reference covering createDeepClause, runDML, compile, tool registration, run options, compile options, and emitted events.">
+    <title>DeepClause SDK API Reference</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../deepclause.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Docs</a>
+                <a href="examples.html">Examples</a>
+                <a href="#constructor">Constructor</a>
+                <a href="#methods">Methods</a>
+                <a href="#events">Events</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <section class="doc-hero">
+            <div class="container reveal">
+                <div class="breadcrumb">
+                    <a href="../index.html">Home</a>
+                    <span>/</span>
+                    <a href="index.html">Docs</a>
+                    <span>/</span>
+                    <a href="sdk-api-reference.html">SDK API Reference</a>
+                </div>
+                <p class="eyebrow">SDK API</p>
+                <h1>Type-shaped reference for the current SDK surface.</h1>
+                <p>
+                    This page follows the exported TypeScript surface from <code>deepclause-sdk</code>.
+                    It is meant to be reference-first: constructor shape, primary methods, option objects,
+                    tool registration contracts, and emitted event fields.
+                </p>
+                <div class="doc-actions">
+                    <a class="button button-primary" href="#constructor">Start with createDeepClause</a>
+                    <a class="button button-secondary" href="examples.html">See runnable examples</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="container doc-layout">
+            <div class="doc-main">
+                <section id="package-surface" class="doc-section reveal">
+                    <span class="section-kicker">Package Surface</span>
+                    <h2>Primary exports</h2>
+
+                    <pre><code>import { createDeepClause } from 'deepclause-sdk';
+import type {
+  CreateOptions,
+  RunOptions,
+  CompileOptions,
+  CompileResult,
+  DMLEvent,
+  ToolDefinition,
+  ToolPolicy,
+} from 'deepclause-sdk';
+
+import {
+  compileToDML,
+  validateWithProlog,
+  analyzeDML,
+} from 'deepclause-sdk/compiler';</code></pre>
+
+                    <div class="callout">
+                        <strong>Two import layers</strong>
+                        Use the main package entry point for runtime execution and type imports.
+                        Use <code>deepclause-sdk/compiler</code> when you want compiler helpers directly.
+                    </div>
+                </section>
+
+                <section id="constructor" class="doc-section reveal">
+                    <span class="section-kicker">Constructor</span>
+                    <h2><code>createDeepClause(options)</code></h2>
+
+                    <pre><code>const dc = await createDeepClause({
+  model: 'gpt-4o',
+  apiKey: process.env.OPENAI_API_KEY,
+  streaming: true,
+  trace: false,
+});</code></pre>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Type</th>
+                                    <th>Meaning</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>model</code></td>
+                                    <td><code>string</code></td>
+                                    <td>Required. Model identifier such as <code>gpt-4o</code> or <code>gemini-2.5-flash</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>apiKey</code></td>
+                                    <td><code>string?</code></td>
+                                    <td>Provider credential for model-backed runs.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>provider</code></td>
+                                    <td><code>'openai' | 'anthropic' | 'google' | 'openrouter'</code></td>
+                                    <td>Optional explicit provider. Otherwise inferred from the model.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>temperature</code></td>
+                                    <td><code>number?</code></td>
+                                    <td>Sampling temperature for task and prompt calls.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>maxTokens</code></td>
+                                    <td><code>number?</code></td>
+                                    <td>Maximum output token budget for model responses.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>baseUrl</code></td>
+                                    <td><code>string?</code></td>
+                                    <td>Optional custom endpoint, useful for compatible transports.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>trace</code></td>
+                                    <td><code>boolean?</code></td>
+                                    <td>Enables execution trace data in the final <code>finished</code> event.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>streaming</code></td>
+                                    <td><code>boolean?</code></td>
+                                    <td>Enables streamed LLM text for <code>task()</code> and <code>prompt()</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>debug</code></td>
+                                    <td><code>boolean?</code></td>
+                                    <td>Emits extra debug information about prompts and tool calls.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>providerOptions</code></td>
+                                    <td><code>Record&lt;string, Record&lt;string, any&gt;&gt;?</code></td>
+                                    <td>Provider-specific SDK options such as reasoning or thinking configuration.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>compaction</code></td>
+                                    <td><code>CompactionOptions?</code></td>
+                                    <td>Default memory compaction settings for task and prompt execution.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="methods" class="doc-section reveal">
+                    <span class="section-kicker">Methods</span>
+                    <h2>The <code>DeepClauseSDK</code> interface</h2>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Method</th>
+                                    <th>Return type</th>
+                                    <th>Purpose</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>runDML(code, options?)</code></td>
+                                    <td><code>AsyncGenerator&lt;DMLEvent&gt;</code></td>
+                                    <td>Execute DML code and stream events as the run progresses.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>compile(source, options?)</code></td>
+                                    <td><code>Promise&lt;CompileResult&gt;</code></td>
+                                    <td>Compile Markdown or a Markdown file path into DML and metadata.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>registerTool(name, tool)</code></td>
+                                    <td><code>void</code></td>
+                                    <td>Register a runtime tool callable through <code>exec()</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>setToolPolicy(policy)</code></td>
+                                    <td><code>void</code></td>
+                                    <td>Apply a whitelist or blacklist policy to registered tools.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>clearToolPolicy()</code></td>
+                                    <td><code>void</code></td>
+                                    <td>Remove the current tool policy and allow all registered tools.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>getToolPolicy()</code></td>
+                                    <td><code>ToolPolicy | null</code></td>
+                                    <td>Inspect the currently active tool policy.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>getTools()</code></td>
+                                    <td><code>string[]</code></td>
+                                    <td>List registered tool names.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>provideInput(input)</code></td>
+                                    <td><code>void</code></td>
+                                    <td>Resume a run waiting for <code>input_required</code> when you are not using <code>onUserInput</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>getMemory()</code></td>
+                                    <td><code>MemoryMessage[]</code></td>
+                                    <td>Inspect current conversation memory as role/content pairs.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>dispose()</code></td>
+                                    <td><code>Promise&lt;void&gt;</code></td>
+                                    <td>Release runtime resources when the SDK instance is no longer needed.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="run-options" class="doc-section reveal">
+                    <span class="section-kicker">runDML Options</span>
+                    <h2><code>RunOptions</code></h2>
+
+                    <pre><code>for await (const event of dc.runDML(code, {
+  args: ['topic'],
+  params: { limit: 5 },
+  workspacePath: process.cwd(),
+  gasLimit: 2000,
+  onUserInput: async (prompt) =&gt; 'continue',
+  signal: abortController.signal,
+  initialMessages: [
+    { role: 'user', content: 'Use repo conventions.' },
+  ],
+})) {
+  console.log(event.type);
+}</code></pre>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Field</th>
+                                    <th>Meaning</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>args</code></td>
+                                    <td>Positional values passed to <code>agent_main</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>params</code></td>
+                                    <td>Named values available through <code>param()</code> and string interpolation.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>workspacePath</code></td>
+                                    <td>Working directory for file and shell-aware runtime behavior.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>gasLimit</code></td>
+                                    <td>Maximum execution steps for the run.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>onUserInput</code></td>
+                                    <td>Callback for interactive <code>input_required</code> events.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>signal</code></td>
+                                    <td>Abort signal for cancellation.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>initialMessages</code></td>
+                                    <td>Seeded user or assistant turns added to memory before execution.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>compaction</code></td>
+                                    <td>Per-run override for compaction bindings and policies.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="compile-options" class="doc-section reveal">
+                    <span class="section-kicker">compile Options</span>
+                    <h2><code>CompileOptions</code> and result shape</h2>
+
+                    <div class="split-grid">
+                        <div>
+                            <h3>Compile options</h3>
+                            <ul class="feature-list">
+                                <li><code>model</code>, <code>provider</code>, <code>temperature</code>, and <code>baseUrl</code> tune the compiler model call.</li>
+                                <li><code>maxAttempts</code> caps retry attempts during compilation.</li>
+                                <li><code>verbose</code> enables richer compilation logs.</li>
+                                <li><code>tools</code> lets you describe additional tools to the compiler.</li>
+                                <li><code>audit</code> toggles the LLM-backed security review layer.</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <h3>Compile result</h3>
+                            <ul class="feature-list">
+                                <li><code>dml</code>: compiled program text.</li>
+                                <li><code>tools</code>: detected external tool dependencies.</li>
+                                <li><code>explanation</code>: brief summary of the generated program.</li>
+                                <li><code>valid</code>, <code>errors</code>, and <code>analysis</code>: validation and audit surface.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tools-and-policy" class="doc-section reveal">
+                    <span class="section-kicker">Tools and Policy</span>
+                    <h2><code>ToolDefinition</code> and <code>ToolPolicy</code></h2>
+
+                    <pre><code>dc.registerTool('weather_lookup', {
+  description: 'Return weather data for a city',
+  parameters: {
+    type: 'object',
+    properties: {
+      city: { type: 'string', description: 'City name' },
+    },
+    required: ['city'],
+  },
+  execute: async ({ city }) =&gt; ({ city, condition: 'sunny' }),
+});
+
+dc.setToolPolicy({
+  mode: 'whitelist',
+  tools: ['weather_*', 'file_read'],
+});</code></pre>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Fields</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>ToolDefinition</code></td>
+                                    <td><code>description</code>, <code>parameters</code> as JSON Schema, and async <code>execute(args)</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>JsonSchema</code></td>
+                                    <td><code>type: 'object'</code>, <code>properties</code>, and optional <code>required</code> keys.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>ToolPolicy</code></td>
+                                    <td><code>mode</code> is <code>whitelist</code> or <code>blacklist</code>; <code>tools</code> supports wildcard patterns like <code>file_*</code>.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="events" class="doc-section reveal">
+                    <span class="section-kicker">Events</span>
+                    <h2><code>DMLEvent</code> stream</h2>
+
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Event type</th>
+                                    <th>Important fields</th>
+                                    <th>When it appears</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>output</code></td>
+                                    <td><code>content</code></td>
+                                    <td>From <code>output()</code> or <code>yield()</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>log</code></td>
+                                    <td><code>content</code></td>
+                                    <td>From <code>log()</code> and runtime log surfaces.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>stream</code></td>
+                                    <td><code>content</code>, <code>done</code></td>
+                                    <td>Incremental model text when streaming is enabled.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>answer</code></td>
+                                    <td><code>content</code></td>
+                                    <td>Final committed answer from <code>answer()</code>.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>input_required</code></td>
+                                    <td><code>prompt</code></td>
+                                    <td>When DML requests user input and no inline callback has satisfied it yet.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>tool_call</code></td>
+                                    <td><code>toolName</code>, <code>toolArgs</code>, <code>toolState</code>, <code>toolResult</code>, <code>toolPid</code>, <code>toolBackend</code>, <code>toolExitCode</code>, <code>toolSummary</code>, <code>toolError</code></td>
+                                    <td>Lifecycle events around external tool execution.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>usage</code></td>
+                                    <td><code>usage</code></td>
+                                    <td>Token accounting for a model call.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>memory_compaction</code></td>
+                                    <td><code>compactionScope</code>, <code>compactionTrigger</code>, <code>compactionAction</code>, <code>beforeTokens</code>, <code>afterTokens</code>, <code>compactionError</code></td>
+                                    <td>Whenever a configured compaction binding is evaluated.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>error</code></td>
+                                    <td><code>content</code></td>
+                                    <td>Runtime or provider failure conditions.</td>
+                                </tr>
+                                <tr>
+                                    <td><code>finished</code></td>
+                                    <td><code>trace?</code></td>
+                                    <td>Terminal event when execution ends.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="compaction" class="doc-section reveal">
+                    <span class="section-kicker">Compaction</span>
+                    <h2>Compaction type surface</h2>
+
+                    <ul class="feature-list">
+                        <li><code>CompactionScope</code>: <code>session</code>, <code>loop</code>, or <code>run</code>.</li>
+                        <li><code>CompactionTrigger</code>: <code>before_user_message</code>, <code>before_model_call</code>, <code>before_task</code>, or <code>after_task</code>.</li>
+                        <li><code>CompactionAction</code>: <code>applied</code>, <code>skipped</code>, or <code>failed</code>.</li>
+                        <li><code>CompactorDefinition</code> supports inline or file-backed DML, model overrides, tool inheritance, gas limits, and policy overrides.</li>
+                        <li><code>CompactorBinding</code> attaches one compactor to a runtime scope and trigger pair.</li>
+                    </ul>
+                </section>
+            </div>
+
+            <aside class="doc-toc reveal">
+                <section class="toc-card">
+                    <h2>On this page</h2>
+                    <ul class="toc-list">
+                        <li><a href="#package-surface">Package surface</a></li>
+                        <li><a href="#constructor">Constructor</a></li>
+                        <li><a href="#methods">Methods</a></li>
+                        <li><a href="#run-options">runDML options</a></li>
+                        <li><a href="#compile-options">compile options</a></li>
+                        <li><a href="#tools-and-policy">Tools and policy</a></li>
+                        <li><a href="#events">Events</a></li>
+                        <li><a href="#compaction">Compaction</a></li>
+                    </ul>
+                </section>
+                <section class="doc-note">
+                    <h3>Reference style</h3>
+                    <p>
+                        This page is deliberately type-first. For workflow guidance, use the docs landing page.
+                        For runnable snippets, use the examples page.
+                    </p>
+                </section>
+            </aside>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Logic-first agents with a local CLI runtime and fullscreen TUI coding agent.</p>
+            </div>
+            <div class="footer-links">
+                <a href="index.html">Docs</a>
+                <a href="examples.html">Examples</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
