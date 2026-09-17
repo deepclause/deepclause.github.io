@@ -210,10 +210,19 @@ code {
 }
 
 .hero-copy h1 {
-  font-size: clamp(2.1rem, 4.6vw, 3.3rem);
+  font-size: clamp(2rem, 4.2vw, 3rem);
   letter-spacing: -0.025em;
   line-height: 1.06;
-  margin: 14px 0 18px;
+  margin: 14px 0 16px;
+}
+
+.hero-sub {
+  color: var(--ink);
+  font-size: clamp(1.05rem, 1.5vw, 1.22rem);
+  font-weight: 500;
+  line-height: 1.45;
+  margin: 0 0 16px;
+  max-width: 42ch;
 }
 
 .lead {
@@ -287,7 +296,7 @@ code {
   color: var(--terminal-green);
   font-family: var(--font-mono);
   font-size: 0.84rem;
-  height: 380px;
+  height: 480px;
   line-height: 1.5;
   overflow: hidden;
   padding: 20px;
@@ -296,6 +305,10 @@ code {
 
 .terminal-line {
   margin-bottom: 6px;
+}
+
+.terminal-line.diagram {
+  color: rgba(230, 240, 255, 0.82);
 }
 
 .terminal-line.output {
@@ -734,7 +747,7 @@ code {
 
   .terminal-body {
     font-size: 0.8rem;
-    height: 380px;
+    height: 480px;
     padding: 16px;
   }
 }
