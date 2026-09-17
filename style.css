@@ -287,7 +287,7 @@ code {
   color: var(--terminal-green);
   font-family: var(--font-mono);
   font-size: 0.84rem;
-  height: 340px;
+  height: 380px;
   line-height: 1.5;
   overflow: hidden;
   padding: 20px;
@@ -734,7 +734,7 @@ code {
 
   .terminal-body {
     font-size: 0.8rem;
-    height: 340px;
+    height: 380px;
     padding: 16px;
   }
 }

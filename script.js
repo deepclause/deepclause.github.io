@@ -2,16 +2,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // ---- hero terminal animation ----
     const terminalContent = document.getElementById('terminal-content');
     const sequence = [
-        { text: '$ pi install git:github.com/deepclause/deepclause-pi', type: 'command', delay: 520 },
-        { text: 'installed pi package deepclause-pi', type: 'muted', delay: 300 },
-        { text: '$ pi', type: 'command', delay: 420 },
-        { text: '> Resolve case AA45175 per the overpayment SOP.', type: 'command', delay: 640 },
-        { text: '[deepclause] case parsed: 3 claims, payer, due date', type: 'muted', delay: 320 },
-        { text: '[deepclause] disposition: $1,275 overpaid', type: 'output', delay: 360 },
+        { text: '$ pi install git:github.com/deepclause/deepclause-pi', type: 'command', delay: 480 },
+        { text: 'installed pi package deepclause-pi', type: 'muted', delay: 280 },
+        { text: '$ pi', type: 'command', delay: 400 },
+        { text: '> Resolve case AA45175 per the overpayment SOP.', type: 'command', delay: 620 },
+        { text: '[deepclause] disposition: $1,275 overpaid', type: 'output', delay: 340 },
         { text: '             re-class $425 + refund $850', type: 'output', delay: 300 },
-        { text: '[deepclause] drafting 2 emails, 2 Slack posts, 1 event', type: 'muted', delay: 360 },
-        { text: '[deepclause] verify: PASS — 7/7 post-conditions', type: 'output', delay: 440 },
-        { text: 'Done. Drafts saved; nothing was sent.', type: 'output', delay: 1200 }
+        { text: '[deepclause] drafting 2 emails, 2 Slack posts, 1 event', type: 'muted', delay: 340 },
+        { text: '[deepclause] verify: PASS — 7/7 post-conditions', type: 'output', delay: 420 },
+        { text: '> Show me a diagram of the policy.', type: 'command', delay: 620 },
+        { text: '[deepclause] rendering presentation + spec diagrams', type: 'muted', delay: 380 },
+        { text: '[deepclause] opening diagrams/viewer.html', type: 'output', delay: 420 },
+        { text: 'Done. Two views ready; click to enlarge.', type: 'output', delay: 1400 }
     ];
 
     function wait(ms) {
