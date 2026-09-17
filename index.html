@@ -3,21 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="DeepClause compiles Markdown specs into executable logic programs and ships a nostalgic fullscreen TUI coding agent, CLI, and SDK.">
-    <title>DeepClause - TUI coding agent, CLI and SDK</title>
+    <meta name="description" content="DeepClause turns SOPs and specifications into executable logic programs. Deterministic rule-based orchestration, typed LLM steps, per-phase tool scoping, static taint analysis, local models, and a portable WASM/AgentVM sandbox. Start with the pi extension, the TypeScript SDK, or the CLI.">
+    <title>DeepClause — executable SOPs and specs for reliable, auditable agents</title>
     <link rel="stylesheet" href="style.css">
+    <noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
 </head>
 <body>
     <header class="site-header">
         <div class="container header-inner">
             <a class="brand" href="#top">
-                <img src="deepclause.png" alt="DeepClause logo">
+                <img src="logo.png" alt="DeepClause logo">
                 <span>DeepClause</span>
             </a>
             <nav class="site-nav">
                 <a href="#what">What it is</a>
+                <a href="#sdd">SDD</a>
+                <a href="#sop2agent">SOP2Agent</a>
+                <a href="#local">Local &amp; secure</a>
+                <a href="#get-started">Get started</a>
                 <a href="docs/index.html">Docs</a>
-                <a href="#tui">TUI</a>
                 <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
             </nav>
         </div>
@@ -25,42 +29,41 @@
 
     <main id="top">
         <section class="hero">
-            <div class="container hero-grid">
-                <div class="hero-copy reveal">
-                    <p class="eyebrow">TUI coding agent, CLI and SDK</p>
-                    <h1>Compile Markdown specs into executable logic programs.</h1>
-                    <p class="lead">
-                        DeepClause turns task descriptions into DML programs with real control flow,
-                        reusable tool orchestration, and a fullscreen Borland-style TUI coding agent.
-                    </p>
-                    <div class="hero-actions">
-                        <a class="button button-primary" href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">View on GitHub</a>
-                        <a class="button button-secondary" href="docs/index.html">Read the docs</a>
-                        <a class="button button-secondary" href="#tui">See the TUI</a>
+            <div class="container">
+                <div class="hero-grid">
+                    <div class="hero-copy reveal">
+                        <p class="eyebrow">Good old-fashioned AI for agents</p>
+                        <h1>Turn SOPs and specs into agents you can audit.</h1>
+                        <p class="lead">
+                            DeepClause turns specs and SOPs into executable logic programs. Deterministic
+                            rules handle what must never go wrong; scoped LLM steps handle the rest.
+                        </p>
+                        <div class="hero-actions">
+                            <a class="button button-primary" href="#get-started">Get started with pi</a>
+                            <a class="button button-secondary" href="#get-started">SDK &amp; CLI</a>
+                            <a class="button button-secondary" href="docs/index.html">Docs</a>
+                        </div>
                     </div>
-                    <div class="pipeline" aria-label="DeepClause pipeline">
-                        <span>Markdown description</span>
-                        <span class="pipeline-arrow">&rarr;</span>
-                        <span>compile</span>
-                        <span class="pipeline-arrow">&rarr;</span>
-                        <span>Logic program</span>
-                        <span class="pipeline-arrow">&rarr;</span>
-                        <span>run</span>
-                        <span class="pipeline-arrow">&rarr;</span>
-                        <span>Output</span>
+                    <div class="terminal-card reveal">
+                        <div class="terminal-window" aria-label="Install and run commands animation">
+                            <div class="terminal-header">
+                                <span>terminal</span>
+                                <span>pi + CLI</span>
+                            </div>
+                            <div class="terminal-body" id="terminal-content"></div>
+                        </div>
                     </div>
                 </div>
-                <div class="terminal-card reveal">
-                    <div class="terminal-window" aria-label="Install commands animation">
-                        <div class="terminal-header">
-                            <span>terminal</span>
-                            <span>npm setup</span>
-                        </div>
-                        <div class="terminal-body" id="terminal-content"></div>
-                        <div class="terminal-preview" id="terminal-preview" aria-hidden="true">
-                            <img src="tui.png" alt="DeepClause TUI preview">
-                        </div>
-                    </div>
+                <div class="pipeline reveal" aria-label="DeepClause pipeline">
+                    <span>SOP / spec</span>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <span>executable DML</span>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <span>review + diagram</span>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <span>run</span>
+                    <span class="pipeline-arrow">&rarr;</span>
+                    <span>trace</span>
                 </div>
             </div>
         </section>
@@ -68,83 +71,224 @@
         <section id="what" class="section section-alt">
             <div class="container">
                 <div class="section-heading reveal">
-                    <p class="eyebrow">What this is</p>
-                    <h2>Not just prompts. Actual programs.</h2>
+                    <p class="eyebrow">What it is</p>
+                    <h2>Specs and SOPs in, auditable agents out.</h2>
+                </div>
+                <div class="card-grid three-up">
+                    <article class="info-card reveal">
+                        <h3>Executable specs</h3>
+                        <p>Specs become programs with guaranteed control flow, typed outputs, and constraints — not prose an agent may ignore.</p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>SOP2Agent</h3>
+                        <p>One auditable policy per workflow: deterministic rules, scoped LLM steps, verified post-conditions.</p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Local &amp; secure</h3>
+                        <p>Runs on local models, inside a WebAssembly logic core and a portable sandbox.</p>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section id="sdd" class="section">
+            <div class="container">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">Spec-driven development</p>
+                    <h2>Loops and graphs are easy. Guarantees are the hard part.</h2>
                     <p>
-                        Most agent systems still reduce behavior to prompts and wrappers. DeepClause takes a different path:
-                        compile task descriptions into a Prolog-based language that can encode retries, branching,
-                        tool calls, and reusable workflow logic directly.
+                        Most specs are still prose in a context window, where a requirement can be
+                        ignored and a fallback can be hallucinated. DeepClause lowers them to a
+                        compact logic language with real control flow.
+                    </p>
+                    <ul class="clean-list">
+                        <li><strong>Guaranteed control flow.</strong> A failed step backtracks to the next clause.</li>
+                        <li><strong>Typed model output.</strong> Integers, lists, and objects are validated and retried.</li>
+                        <li><strong>Reviewable artifact.</strong> The <code>.dml</code> is the plan — diff it, test it, ship it.</li>
+                    </ul>
+                    <p class="link-row">
+                        <a href="https://deepclause.substack.com/p/loops-graphs-prolog" target="_blank" rel="noreferrer">Read: loops and graphs &rarr;</a>
+                        <a href="docs/dml-language-reference.html">DML reference &rarr;</a>
+                    </p>
+                </div>
+                <figure class="screenshot-frame diagram-wide reveal">
+                    <div class="diagram-tall">
+                        <img class="zoomable" data-full="images/sdd-deep-research.png" src="images/sdd-deep-research.png" alt="Deep research DML workflow graph with six phases, Bing search tool calls, and a user approval step." loading="lazy" width="1500" height="4243">
+                    </div>
+                    <figcaption>
+                        A deep-research workflow as a DML graph: phases, typed outputs, a human
+                        approval step, and per-phase tool scopes.
+                        <a class="link-inline" href="images/sdd-deep-research.png" target="_blank" rel="noreferrer">Open full size</a>
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <section id="sop2agent" class="section section-alt">
+            <div class="container">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">SOP2Agent</p>
+                    <h2>Turn a 100-page SOP into agents that follow it — verifiably.</h2>
+                    <p>
+                        Long SOPs are where agents fail, and where compliance matters most.
+                        DeepClause turns an SOP into one auditable policy per workflow.
                     </p>
                 </div>
                 <div class="card-grid three-up">
                     <article class="info-card reveal">
-                        <h3>Declarative skills</h3>
-                        <p>DML skills are executable logic programs instead of one-shot prompt templates.</p>
+                        <h3>Deterministic spine</h3>
+                        <p>Amounts, thresholds, and deadlines are computed as rules — never judged by the model.</p>
                     </article>
                     <article class="info-card reveal">
-                        <h3>Real orchestration</h3>
-                        <p>Control flow, fallback behavior, and tool usage live in the program, not in ad hoc glue code.</p>
+                        <h3>Agentic leaves</h3>
+                        <p>Reading and drafting run as scoped LLM loops with only the allowed tools.</p>
                     </article>
                     <article class="info-card reveal">
-                        <h3>Inspectable runtime</h3>
-                        <p>The CLI exposes sessions, context, execution logs, usage, and local skill catalogs.</p>
+                        <h3>Verified outcome</h3>
+                        <p>The program re-reads the result and reports <code>PASS</code>/<code>FAIL</code> against post-conditions.</p>
                     </article>
                 </div>
+                <div class="callout-strip reveal">
+                    <span>Rules live in code, not in the model's judgement.</span>
+                    <span>Drafts only — no way to send email.</span>
+                    <span>No tool to approve your own invoice.</span>
+                </div>
+                <div class="diagram-pair reveal">
+                    <figure class="screenshot-frame">
+                        <div class="diagram-tall">
+                            <img class="zoomable" data-full="images/sop2agent-overpayment.png" src="images/sop2agent-overpayment.png" alt="Flowchart of a payer overpayment SOP: understand the request, confirm with the user, compute the disposition, take actions, verify seven post-conditions." loading="lazy" width="1600" height="2597">
+                        </div>
+                        <figcaption>
+                            Presentation grade — the flow a reviewer reads first.
+                            <a class="link-inline" href="images/sop2agent-overpayment.png" target="_blank" rel="noreferrer">Open full size</a>
+                        </figcaption>
+                    </figure>
+                    <figure class="screenshot-frame">
+                        <div class="diagram-tall">
+                            <img class="zoomable" data-full="images/sop2agent-overpayment-spec.png" src="images/sop2agent-overpayment-spec.png" alt="Specification-grade DeepClause diagram of the credit-balance policy, including declared read and write tools." loading="lazy" width="1800" height="1693">
+                        </div>
+                        <figcaption>
+                            Specification grade — every phase and its allowed tools.
+                            <a class="link-inline" href="images/sop2agent-overpayment-spec.png" target="_blank" rel="noreferrer">Open full size</a>
+                        </figcaption>
+                    </figure>
+                </div>
+                <p class="link-row reveal">
+                    <a href="https://deepclause.substack.com/p/make-sops-executable-policies-as" target="_blank" rel="noreferrer">Read: make SOPs executable &rarr;</a>
+                </p>
             </div>
         </section>
 
-        <section id="docs" class="section">
+        <section id="regulated" class="section">
             <div class="container">
                 <div class="section-heading reveal">
-                    <p class="eyebrow">Documentation</p>
-                    <h2>Start with the operational docs.</h2>
+                    <p class="eyebrow">Built for regulated work</p>
+                    <h2>Audit-ready by construction.</h2>
                     <p>
-                        The microsite now includes a dedicated documentation area covering the runtime model,
-                        the fullscreen TUI, the CLI and SDK surface, and an up-to-date DML language reference.
+                        When an agent moves money or touches regulated data, &ldquo;the model said
+                        so&rdquo; is not an answer.
                     </p>
                 </div>
-                <div class="card-grid four-up">
-                    <a class="info-card reveal" href="docs/index.html#overview">
-                        <h3>Overview</h3>
-                        <p>Project layout, seeded system assets, shell isolation, skill creator helpers, and runtime features.</p>
-                    </a>
-                    <a class="info-card reveal" href="docs/index.html#tui">
-                        <h3>TUI</h3>
-                        <p>Pane layout, slash commands, <code>!command</code> vs <code>!!command</code>, sessions, and conductor behavior.</p>
-                    </a>
-                    <a class="info-card reveal" href="docs/index.html#cli-sdk">
-                        <h3>CLI and SDK</h3>
-                        <p>Install, init, compile, run, model slots, config, SDK events, custom tools, and policies.</p>
-                    </a>
-                    <a class="info-card reveal" href="docs/dml-language-reference.html">
-                        <h3>DML Reference</h3>
-                        <p>Current language semantics for <code>agent_main</code>, <code>task</code>, <code>prompt</code>, <code>exec</code>, params, helpers, and control flow.</p>
-                    </a>
+                <div class="card-grid three-up">
+                    <article class="info-card reveal">
+                        <h3>Traceability</h3>
+                        <p>Every step is recorded; <code>--trace</code> writes a run record for review.</p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Policy as code</h3>
+                        <p>Policies live in version control and go through code review.</p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Least privilege</h3>
+                        <p>Tools are scoped per phase. Prohibited actions have no capability.</p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Data residency</h3>
+                        <p>Local or on-prem models; network egress off by default.</p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Deterministic controls</h3>
+                        <p>Monetary and eligibility logic produces the same result every run.</p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Visual audit</h3>
+                        <p>Generated diagrams show reviewers the policy and its limits.</p>
+                    </article>
                 </div>
             </div>
         </section>
 
-        <section id="tui" class="section">
-            <div class="container screenshot-layout">
-                <div class="section-heading reveal compact">
-                    <p class="eyebrow">TUI coding agent</p>
-                    <h2>A fullscreen interface for local coding and automation.</h2>
-                    <p>
-                        Running <code>deepclause</code> with no subcommand opens the fullscreen TUI coding agent.
-                        The left pane is sessions, the center pane is the conversation, and the right side shows
-                        execution activity plus context.
-                    </p>
-                    <ul class="clean-list spaced">
-                        <li>Open it with a single <code>deepclause</code> command after npm install and workspace setup.</li>
-                        <li>Use it to chat, inspect execution, and run local skills from one screen.</li>
-                        <li>The agent can answer directly, run local skills, create new ones, use shell tools, and do web research.</li>
-                        <li>Session transcript and memory files are loaded each turn so work stays grounded in the current repo.</li>
-                    </ul>
+        <section id="local" class="section section-alt">
+            <div class="container">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">Local-first and secure</p>
+                    <h2>Your models. Your data. A sandbox you can prove.</h2>
+                    <p>Built to raise small and local models, not to assume a frontier API.</p>
                 </div>
-                <figure class="screenshot-frame reveal">
-                    <img src="tui.png" alt="DeepClause TUI screenshot">
-                    <figcaption>DeepClause session view with messages, execution log, and context panes.</figcaption>
-                </figure>
+                <div class="card-grid three-up">
+                    <article class="info-card reveal">
+                        <h3>Bring your own endpoint</h3>
+                        <p>Point DeepClause at Ollama, vLLM, LM Studio, or any OpenAI-compatible server.</p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Isolation</h3>
+                        <p>A WebAssembly logic core, an AgentVM shell sandbox, and bwrap/seatbelt host isolation.</p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>Compile-time security</h3>
+                        <p>Static taint analysis flags untrusted data reaching prompts, tools, or memory.</p>
+                    </article>
+                </div>
+                <div class="info-panel gap-top reveal">
+                    <h3>Measured small-model lift</h3>
+                    <p>
+                        On DeepPlanning travel planning, DeepClause lifted a <strong>35B local
+                        model from 22.2% to 42.9% composite</strong> and from <strong>82.5% to
+                        98.3% task delivery</strong>.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="get-started" class="section">
+            <div class="container">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">Get started</p>
+                    <h2>Start in pi. Embed anywhere.</h2>
+                    <p>Author and run policies in your coding session, or embed DeepClause in your own service.</p>
+                </div>
+                <div class="card-grid three-up">
+                    <article class="info-card reveal accent-card">
+                        <h3>pi extension <span class="tag">recommended</span></h3>
+                        <pre class="snippet"><code>pi install \
+  git:github.com/deepclause/deepclause-pi</code></pre>
+                        <p>Ask pi to turn your SOP into DML, then run it with <code>/dc-run</code>. Uses pi's model and credentials.</p>
+                        <p><a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension on GitHub &rarr;</a></p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>TypeScript SDK</h3>
+                        <pre class="snippet"><code>import { createDeepClause } from "deepclause-sdk";
+
+const dc = await createDeepClause({
+  model: "host-active-model",
+  llmBackend, // your model
+});</code></pre>
+                        <p>Bring your own model backend; no provider keys required when the host supplies the LLM.</p>
+                        <p><a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">SDK on GitHub &rarr;</a></p>
+                    </article>
+                    <article class="info-card reveal">
+                        <h3>CLI</h3>
+                        <pre class="snippet"><code>npm install -g deepclause-sdk
+deepclause compile spec.md --analyze
+deepclause run skill.dml --sandbox</code></pre>
+                        <p>Headless execution for CI and scripts, with static analysis built in.</p>
+                        <p><a href="docs/index.html#cli-sdk">CLI and SDK docs &rarr;</a></p>
+                    </article>
+                </div>
+                <div class="mini-note reveal">
+                    <strong>Other agents and hosts:</strong> use the SDK's injectable model backend,
+                    the CLI, or MCP tools. The runtime tool whitelist stays explicit.
+                </div>
             </div>
         </section>
     </main>
@@ -153,15 +297,22 @@
         <div class="container footer-inner">
             <div>
                 <strong>DeepClause</strong>
-                <p>Logic-first agents with a local CLI runtime and fullscreen TUI coding agent.</p>
+                <p>Executable SOPs and specs for reliable, auditable agents.</p>
             </div>
             <div class="footer-links">
                 <a href="docs/index.html">Docs</a>
-                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+                <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">SDK</a>
                 <a href="blog/index.html">Blog</a>
+                <a href="https://github.com/deepclause" target="_blank" rel="noreferrer">GitHub</a>
             </div>
         </div>
     </footer>
+
+    <div id="lightbox" class="lightbox" hidden>
+        <button class="lightbox-close" type="button" aria-label="Close">&times;</button>
+        <img id="lightbox-img" alt="">
+    </div>
 
     <script src="script.js"></script>
 </body>

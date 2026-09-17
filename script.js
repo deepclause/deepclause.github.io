@@ -1,16 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // ---- hero terminal animation ----
     const terminalContent = document.getElementById('terminal-content');
-    const terminalPreview = document.getElementById('terminal-preview');
     const sequence = [
-        { text: '$ npm install -g deepclause-sdk', type: 'command', delay: 560 },
-        { text: 'added 1 package in 3s', type: 'output', delay: 360 },
-        { text: '$ export OPENAI_API_KEY="sk-..."', type: 'command', delay: 420 },
-        { text: '$ deepclause init --model openai:gpt-4o', type: 'command', delay: 560 },
-        { text: 'created .deepclause/config.json', type: 'muted', delay: 220 },
-        { text: 'created .deepclause/tools/', type: 'muted', delay: 220 },
-        { text: '$ deepclause', type: 'command', delay: 520 },
-        { text: 'opening fullscreen TUI coding agent...', type: 'muted', delay: 400 },
-        { type: 'preview', delay: 3000 }
+        { text: '$ pi install git:github.com/deepclause/deepclause-pi', type: 'command', delay: 520 },
+        { text: 'installed pi package deepclause-pi', type: 'muted', delay: 300 },
+        { text: '$ pi', type: 'command', delay: 420 },
+        { text: '> Resolve case AA45175 per the overpayment SOP.', type: 'command', delay: 640 },
+        { text: '[deepclause] case parsed: 3 claims, payer, due date', type: 'muted', delay: 320 },
+        { text: '[deepclause] disposition: $1,275 overpaid', type: 'output', delay: 360 },
+        { text: '             re-class $425 + refund $850', type: 'output', delay: 300 },
+        { text: '[deepclause] drafting 2 emails, 2 Slack posts, 1 event', type: 'muted', delay: 360 },
+        { text: '[deepclause] verify: PASS — 7/7 post-conditions', type: 'output', delay: 440 },
+        { text: 'Done. Drafts saved; nothing was sent.', type: 'output', delay: 1200 }
     ];
 
     function wait(ms) {
@@ -25,41 +26,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function showPreview(duration) {
-        if (!terminalPreview || !terminalContent) {
-            await wait(duration);
-            return;
-        }
-
-        terminalContent.classList.add('previewing');
-        terminalPreview.classList.add('active');
-        await wait(duration);
-        terminalPreview.classList.remove('active');
-        terminalContent.classList.remove('previewing');
-        await wait(220);
-    }
-
     async function renderSequence() {
         if (!terminalContent) {
             return;
         }
 
         terminalContent.textContent = '';
-        terminalContent.classList.remove('previewing');
-        terminalPreview?.classList.remove('active');
 
         for (const line of sequence) {
-            if (line.type === 'preview') {
-                await showPreview(line.delay);
-                continue;
-            }
-
             const row = document.createElement('div');
             row.className = `terminal-line ${line.type}`;
             terminalContent.appendChild(row);
 
             if (line.type === 'command') {
-                await typeText(row, line.text, 15);
+                await typeText(row, line.text, 13);
             } else {
                 row.textContent = line.text;
             }
@@ -68,12 +48,52 @@ document.addEventListener('DOMContentLoaded', () => {
             await wait(line.delay);
         }
 
-        await wait(1000);
+        await wait(1600);
         renderSequence();
     }
 
     void renderSequence();
 
+    // ---- click-to-enlarge lightbox ----
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+
+    if (lightbox && lightboxImg) {
+        const closeLightbox = () => {
+            lightbox.hidden = true;
+            lightboxImg.removeAttribute('src');
+            document.body.style.overflow = '';
+        };
+
+        document.querySelectorAll('.zoomable').forEach((img) => {
+            img.addEventListener('click', () => {
+                lightboxImg.src = img.dataset.full || img.src;
+                lightboxImg.alt = img.alt || '';
+                lightbox.hidden = false;
+                lightbox.scrollTop = 0;
+                document.body.style.overflow = 'hidden';
+            });
+        });
+
+        lightbox.addEventListener('click', (event) => {
+            if (event.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        const closeButton = lightbox.querySelector('.lightbox-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', closeLightbox);
+        }
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && !lightbox.hidden) {
+                closeLightbox();
+            }
+        });
+    }
+
+    // ---- reveal on scroll ----
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
