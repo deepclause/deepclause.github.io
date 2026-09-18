@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DeepClause SDK and CLI: install, run compiled DML headless, embed the runtime in TypeScript with a host-provided LLM backend, configure model slots and local providers, and sandbox execution.">
+    <title>SDK &amp; CLI — DeepClause docs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../logo.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Docs</a>
+                <a href="speckit.html">SpecKit</a>
+                <a href="handbook.html">Handbook</a>
+                <a href="dml-language-reference.html">DML reference</a>
+                <a href="sdk.html">SDK &amp; CLI</a>
+                <a href="examples.html">Examples</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <div class="container docs-shell">
+            <aside class="docs-sidebar">
+                <nav>
+                    <p class="sidebar-label">Guides</p>
+                    <a href="index.html">Documentation</a>
+                    <a href="speckit.html">SpecKit (SDD)</a>
+                    <a href="handbook.html">Handbook &rarr; DML</a>
+                    <p class="sidebar-label">Reference</p>
+                    <a href="dml-language-reference.html">DML reference</a>
+                    <a href="sdk.html" class="active">SDK &amp; CLI</a>
+                    <a href="sdk-api-reference.html">API reference</a>
+                    <a href="examples.html">Examples</a>
+                    <p class="sidebar-label">On this page</p>
+                    <a href="#install">Install</a>
+                    <a href="#cli">CLI</a>
+                    <a href="#sdk">Embed in TypeScript</a>
+                    <a href="#models">Models and providers</a>
+                    <a href="#sandbox">Runtime and sandboxing</a>
+                </nav>
+            </aside>
+
+            <div class="docs-content">
+                <header class="docs-intro reveal">
+                    <p class="eyebrow">Reference</p>
+                    <h1>SDK &amp; CLI</h1>
+                    <p class="docs-lead">
+                        Embed DeepClause in a TypeScript service, or run compiled DML headless in CI.
+                        The SDK and CLI use the same runtime that powers the pi extension.
+                    </p>
+                    <div class="doc-actions">
+                        <a class="button button-primary" href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">SDK on GitHub</a>
+                        <a class="button button-secondary" href="sdk-api-reference.html">API reference</a>
+                    </div>
+                </header>
+
+                <section id="install" class="docs-section reveal">
+                    <h2>Install</h2>
+                    <p>DeepClause requires Node.js 18+.</p>
+                    <pre><code>npm install -g deepclause-sdk
+deepclause init --model openai:gpt-4o
+deepclause show-model</code></pre>
+                    <p>
+                        <code>deepclause init</code> creates <code>.deepclause/config.json</code>,
+                        the local tools directory, and the seeded system assets. Every command
+                        except <code>init</code> expects a <code>.deepclause/</code> directory in the
+                        workspace. Use <code>npx deepclause-sdk@latest</code> for a one-off run.
+                    </p>
+                </section>
+
+                <section id="cli" class="docs-section reveal">
+                    <h2>CLI</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Command</th><th>Effect</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>deepclause init</code></td><td>Initialize <code>.deepclause/</code> in the workspace</td></tr>
+                                <tr><td><code>deepclause set-model &lt;model&gt;</code></td><td>Set the model for all slots, or one with <code>--slot</code></td></tr>
+                                <tr><td><code>deepclause show-model</code></td><td>Show the resolved <code>gateway</code>, <code>run</code>, <code>compile</code> slots</td></tr>
+                                <tr><td><code>deepclause compile &lt;file.md&gt;</code></td><td>Compile a spec to DML (static analysis always; LLM audit by default)</td></tr>
+                                <tr><td><code>deepclause run &lt;file.dml&gt; [args]</code></td><td>Execute a compiled DML program</td></tr>
+                                <tr><td><code>deepclause plan &lt;file.md&gt;</code></td><td>Generate a standalone DML plan from a Markdown spec</td></tr>
+                                <tr><td><code>deepclause list-tools</code></td><td>Show the resolved built-in and MCP tools</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>Useful run flags:</p>
+                    <pre><code>deepclause run skill.dml "input" \
+    --model google:gemini-2.5-flash \
+    --stream \
+    --workspace ./data \
+    --sandbox \
+    --trace run.json</code></pre>
+                </section>
+
+                <section id="sdk" class="docs-section reveal">
+                    <h2>Embed in TypeScript</h2>
+                    <p>
+                        Supply a host-provided model backend with <code>createDeepClause</code>; no
+                        provider credentials are required when the host supplies the LLM.
+                    </p>
+                    <pre><code>import { createDeepClause, type LLMBackend } from "deepclause-sdk";
+
+const llmBackend: LLMBackend = {
+  async complete(request) {
+    const response = await hostModel.complete({
+      messages: request.messages,
+      tools: request.tools,
+      signal: request.signal,
+    });
+    return {
+      text: response.text,
+      toolCalls: response.toolCalls,
+      usage: response.usage,
+    };
+  },
+};
+
+const deepclause = await createDeepClause({
+  model: "host-active-model",
+  llmBackend,
+});</code></pre>
+                    <p>
+                        The backend receives messages, DML task tools, cancellation, token limits,
+                        and an optional <code>onText</code> callback. DML-defined tool predicates
+                        stay under a runtime tool whitelist, so an embedding exposes high-level DML
+                        tools without handing over the full runtime registry.
+                    </p>
+                    <p class="link-row">
+                        <a href="sdk-api-reference.html">API reference &rarr;</a>
+                        <a href="https://github.com/deepclause/deepclause-sdk/tree/main/sdk-examples" target="_blank" rel="noreferrer">SDK examples &rarr;</a>
+                    </p>
+                </section>
+
+                <section id="models" class="docs-section reveal">
+                    <h2>Models and providers</h2>
+                    <p>
+                        Model choice is split into three slots: <code>gateway</code> (orchestration),
+                        <code>run</code> (skill execution), and <code>compile</code> (authoring).
+                    </p>
+                    <pre><code>deepclause set-model anthropic:claude-sonnet-4-20250514 --slot compile
+deepclause set-model openrouter:google/gemini-2.5-flash --slot gateway</code></pre>
+                    <p>
+                        For local or self-hosted models, use an OpenAI-compatible
+                        <code>custom:</code> provider:
+                    </p>
+                    <pre><code>export LLM_PROVIDER_LOCAL_BASE_URL="http://localhost:11434/v1"
+export LLM_PROVIDER_LOCAL_API_KEY="dummy"
+deepclause set-model custom:local:qwen3-32b --slot run</code></pre>
+                    <p class="footnote">
+                        Works with Ollama, vLLM, LM Studio, or any endpoint that speaks an
+                        OpenAI-style chat/completions API.
+                    </p>
+                </section>
+
+                <section id="sandbox" class="docs-section reveal">
+                    <h2>Runtime and sandboxing</h2>
+                    <ul>
+                        <li><strong>WASM logic core.</strong> DML executes in a logic engine compiled to WebAssembly; the host is reachable only through explicit hooks.</li>
+                        <li><strong>Host shell by default.</strong> Shell tools run in the active workspace; <code>shell.wrapper</code> can force <code>clean-room</code>, <code>bwrap</code>, or <code>sandbox-exec</code>.</li>
+                        <li><strong>AgentVM on demand.</strong> <code>--sandbox</code> runs shell tools inside a dependency-free container VM, with network off by default.</li>
+                        <li><strong>Compile-time security.</strong> Static taint analysis flags untrusted data reaching the system prompt, dangerous tools, or task memory; an optional LLM audit reviews the program. Use <code>--no-audit</code> to skip only the LLM review.</li>
+                    </ul>
+                    <p class="link-row">
+                        <a href="handbook.html">SOP2Agent &rarr;</a>
+                        <a href="speckit.html">SpecKit &rarr;</a>
+                        <a href="dml-language-reference.html">DML reference &rarr;</a>
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Executable SOPs and specs for reliable, auditable agents.</p>
+            </div>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">SDK</a>
+                <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

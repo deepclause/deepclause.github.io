@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SpecKit for pi: spec-driven development with Markdown specs, reviewed change proposals, deterministic DML validation, and gated apply, verify, resume and archive.">
+    <title>SpecKit for pi — DeepClause docs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../logo.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Docs</a>
+                <a href="speckit.html">SpecKit</a>
+                <a href="handbook.html">Handbook</a>
+                <a href="dml-language-reference.html">DML reference</a>
+                <a href="sdk.html">SDK &amp; CLI</a>
+                <a href="examples.html">Examples</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <div class="container docs-shell">
+            <aside class="docs-sidebar">
+                <nav>
+                    <p class="sidebar-label">Guides</p>
+                    <a href="index.html">Documentation</a>
+                    <a href="speckit.html" class="active">SpecKit (SDD)</a>
+                    <a href="handbook.html">Handbook &rarr; DML</a>
+                    <p class="sidebar-label">Reference</p>
+                    <a href="dml-language-reference.html">DML reference</a>
+                    <a href="sdk.html">SDK &amp; CLI</a>
+                    <a href="sdk-api-reference.html">API reference</a>
+                    <a href="examples.html">Examples</a>
+                    <p class="sidebar-label">On this page</p>
+                    <a href="#what">What it is</a>
+                    <a href="#loop">The change loop</a>
+                    <a href="#commands">Commands</a>
+                    <a href="#specs">Writing specs</a>
+                    <a href="#tasks">The task plan</a>
+                    <a href="#verify">Verify, resume, rollback</a>
+                    <a href="#limits">Limits</a>
+                </nav>
+            </aside>
+
+            <div class="docs-content">
+                <header class="docs-intro reveal">
+                    <p class="eyebrow">SDD &middot; SpecKit for pi</p>
+                    <h1>Spec-driven development with SpecKit</h1>
+                    <p class="docs-lead">
+                        Spec-driven changes for pi, without leaving the session. Markdown specs are
+                        the source of truth; a change is a reviewed proposal; and validation,
+                        merging and coverage are deterministic DML.
+                    </p>
+                    <div class="doc-actions">
+                        <a class="button button-primary" href="https://github.com/deepclause/deepclause-pi/blob/main/docs/SPECKIT.md" target="_blank" rel="noreferrer">Full guide on GitHub</a>
+                        <a class="button button-secondary" href="index.html">Back to docs</a>
+                    </div>
+                </header>
+
+                <section id="what" class="docs-section reveal">
+                    <h2>What it is</h2>
+                    <ul>
+                        <li><strong>Specs describe behaviour.</strong> Plain Markdown under <code>.pi/deepclause/specs/</code> is the source of truth.</li>
+                        <li><strong>A change is a reviewed proposal.</strong> <code>.pi/deepclause/changes/&lt;slug&gt;/</code> holds a proposal, delta specs, optional design notes, and an executable task plan.</li>
+                        <li><strong>Only the model touches prose.</strong> Parsing, validation, merging, coverage, verification and rollback are deterministic DML — no model calls.</li>
+                        <li><strong>Nothing lands silently.</strong> Every step that writes or executes is a gated, reviewable command.</li>
+                    </ul>
+                    <p>
+                        Most spec tools are a Markdown convention plus a program that parses it. The
+                        convention is the good idea; the program is where it gets fragile, because
+                        parsing and merging structured text is usually written as regexes and
+                        imperative branches. Spec work is logic: a requirement is a term; <em>every
+                        requirement has at least one scenario</em> is a rule; merging a delta is
+                        matching and rewriting; coverage and conflicts are queries. DML expresses
+                        these directly.
+                    </p>
+                </section>
+
+                <section id="loop" class="docs-section reveal">
+                    <h2>The change loop</h2>
+                    <p>The bootstrap is <strong>conversation &rarr; change &rarr; applied &rarr; spec</strong>.</p>
+                    <pre><code>git init
+printf 'node_modules/\ndist/\n' &gt; .gitignore
+git add -A &amp;&amp; git commit -m "init"</code></pre>
+                    <p>Then, in pi:</p>
+                    <pre><code>/dc
+/dc-plan build a URL shortener with slugs and click counts --change=url_shortener
+
+git add -A &amp;&amp; git commit -m "plan: url_shortener"
+
+/dc-check url_shortener     # grammar, delta, scenario coverage (0 tokens)
+/dc-apply url_shortener     # shows the tasks and command set -&gt; confirm
+/dc-archive url_shortener   # shows the merge diff -&gt; confirm</code></pre>
+                    <p>
+                        Archiving creates <code>specs/shortener/links.spec.md</code> and moves the
+                        change to <code>changes/archive/</code>. Every later feature is the same
+                        loop, but pi reads the existing specs first and writes
+                        <code>## MODIFIED Requirements</code> when it changes existing behaviour.
+                    </p>
+                </section>
+
+                <section id="commands" class="docs-section reveal">
+                    <h2>Commands</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Command</th><th>Effect</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>/dc-plan &lt;request&gt; --change=&lt;slug&gt;</code></td><td>Change plan: proposal + delta specs + <code>tasks.dml</code></td></tr>
+                                <tr><td><code>/dc-check &lt;slug&gt;</code></td><td>Validate every spec, delta and coverage hole (0 tokens)</td></tr>
+                                <tr><td><code>/dc-apply &lt;slug&gt;</code></td><td>Execute tasks; verify, retry, resume</td></tr>
+                                <tr><td><code>/dc-archive &lt;slug&gt;</code></td><td>Merge the delta into <code>specs/</code> and move the change to <code>archive/</code></td></tr>
+                                <tr><td><code>/dc-run spec_status</code></td><td>Capability and delta inventory</td></tr>
+                                <tr><td><code>/dc-run spec_query ui/theme</code></td><td>One capability's requirements and scenarios</td></tr>
+                                <tr><td><code>/dc-run spec_coverage &lt;slug&gt;</code></td><td>Uncovered scenarios, tasks without checks</td></tr>
+                                <tr><td><code>/dc-run spec_graph capabilities</code></td><td>Mermaid graph of capabilities and changes</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="footnote">
+                        <code>/dc-run</code> refuses skills marked <code>% Mutating: true</code>, so
+                        mutating steps always go through the reviewed <code>/dc-apply</code> and
+                        <code>/dc-archive</code> paths.
+                    </p>
+                </section>
+
+                <section id="specs" class="docs-section reveal">
+                    <h2>Writing specs</h2>
+                    <pre><code># Theme Specification
+
+## Purpose
+Lets users choose between light and dark themes, defaulting to the OS preference.
+
+## Requirements
+
+### Requirement: Theme selection
+The app SHALL let users switch between light and dark themes at runtime.
+
+#### Scenario: User toggles dark mode
+- **WHEN** the user clicks the theme toggle
+- **THEN** the app switches to dark mode and persists the choice</code></pre>
+                    <p>The validator enforces:</p>
+                    <ul>
+                        <li>exactly <strong>three</strong> hashes for <code>### Requirement:</code> and <strong>four</strong> for <code>#### Scenario:</code>;</li>
+                        <li>every requirement has at least one scenario;</li>
+                        <li>no duplicate requirement names;</li>
+                        <li>specs are behaviour only — no commands, paths, or library choices.</li>
+                    </ul>
+                    <p>
+                        A delta wraps requirements in <code>## ADDED Requirements</code>,
+                        <code>## MODIFIED Requirements</code>, <code>## REMOVED Requirements</code>
+                        or <code>## RENAMED Requirements</code>. <code>MODIFIED</code> carries the
+                        full replacement; <code>MODIFIED</code>/<code>REMOVED</code> must name a
+                        requirement that exists, otherwise <code>/dc-archive</code> refuses rather
+                        than silently dropping it.
+                    </p>
+                    <p class="footnote">
+                        Scenario ids are the join key between specs and tasks:
+                        <code>Theme selection</code> in <code>ui/theme</code> &rarr;
+                        <code>ui/theme#theme-selection</code>.
+                    </p>
+                </section>
+
+                <section id="tasks" class="docs-section reveal">
+                    <h2>The task plan</h2>
+                    <p><code>tasks.dml</code> is data, not a program:</p>
+                    <pre><code>plan_task("1.1", task{
+    executor:  pi,
+    do:        "Add a ThemeProvider context exposing theme and setTheme.",
+    tools:     ["read", "edit"],
+    expected:  "src/theme/ThemeProvider.tsx exports ThemeProvider and typechecks.",
+    satisfies: ["ui/theme#theme-selection"],
+    checks:    [ exists("src/theme/ThemeProvider.tsx"),
+                 cmd("npm run typecheck") ]
+}).
+
+% --- execution state (managed by apply.dml; do not edit by hand) ---
+plan_task_status("1.1", pending).</code></pre>
+                    <ul>
+                        <li><code>executor: pi</code> delegates a bounded step to pi with exactly the listed tools; <code>executor: dml</code> uses contained model reasoning.</li>
+                        <li><code>satisfies</code> links the step to delta scenarios; <code>/dc-check</code> fails if any delta scenario is uncovered.</li>
+                        <li>Checks are declarative: <code>exists("path")</code>, <code>cmd("command")</code>, <code>model("question")</code>.</li>
+                    </ul>
+                </section>
+
+                <section id="verify" class="docs-section reveal">
+                    <h2>Verify, resume, rollback</h2>
+                    <ul>
+                        <li><strong>Checks</strong> run after each step. A failed check retries the step (up to 3 attempts) with the failure evidence threaded into the repair instruction.</li>
+                        <li><strong>Verification commands</strong> are approved once per run and then executed through the allowlisted <code>dc_verify_run</code> tool.</li>
+                        <li><strong>Snapshots:</strong> <code>/dc-apply</code> records a git ref before running and refuses to start on a dirty tree.</li>
+                        <li><strong>Resume:</strong> if a run stops, the tree and <code>done</code>/<code>failed</code> statuses are preserved; re-run <code>/dc-apply</code> to continue from the remaining tasks.</li>
+                        <li><strong>Abort:</strong> <code>/dc-apply &lt;change&gt; --abort</code> restores the snapshot and resets task statuses.</li>
+                    </ul>
+                </section>
+
+                <section id="limits" class="docs-section reveal">
+                    <h2>Limits</h2>
+                    <ul>
+                        <li><code>RENAMED</code> deltas are validated but not merged yet.</li>
+                        <li>There is no digest/drift check beyond the merge guard; run <code>/dc-check</code> after editing specs by hand.</li>
+                        <li><code>/dc-archive</code> does not run <code>/dc-check</code> for you, and it writes per capability.</li>
+                    </ul>
+                    <p class="link-row">
+                        <a href="https://github.com/deepclause/deepclause-pi/blob/main/docs/SPECKIT.md" target="_blank" rel="noreferrer">Full SPECKIT.md &rarr;</a>
+                        <a href="https://github.com/deepclause/deepclause-pi/blob/main/docs/SPEC_LAYER_PROPOSAL.md" target="_blank" rel="noreferrer">Design rationale &rarr;</a>
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Executable SOPs and specs for reliable, auditable agents.</p>
+            </div>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">SDK</a>
+                <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

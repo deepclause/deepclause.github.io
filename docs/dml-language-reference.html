@@ -17,40 +17,54 @@
             </a>
             <nav class="site-nav">
                 <a href="index.html">Docs</a>
-                <a href="#entry-points">Entry Points</a>
-                <a href="#llm-predicates">LLM Predicates</a>
-                <a href="#exec-and-tools">Exec and Tools</a>
-                <a href="#params-and-directives">Params</a>
+                <a href="speckit.html">SpecKit</a>
+                <a href="handbook.html">Handbook</a>
+                <a href="dml-language-reference.html">DML reference</a>
+                <a href="sdk.html">SDK &amp; CLI</a>
+                <a href="examples.html">Examples</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
             </nav>
         </div>
     </header>
 
     <main class="doc-page">
-        <section class="doc-hero">
-            <div class="container reveal">
-                <div class="breadcrumb">
-                    <a href="../index.html">Home</a>
-                    <span>/</span>
-                    <a href="index.html">Docs</a>
-                    <span>/</span>
-                    <a href="dml-language-reference.html">DML Language Reference</a>
-                </div>
-                <p class="eyebrow">Reference</p>
-                <h1>DML language reference for the current runtime.</h1>
-                <p>
-                    DML is a Prolog-style language for agent workflows. It combines declarative logic, backtracking,
-                    recursion, direct tool execution, and LLM-driven subtasks. This page reflects the current runtime behavior,
-                    including the modern task harness and task-loop semantics.
-                </p>
-                <div class="doc-actions">
-                    <a class="button button-primary" href="index.html">Back to docs</a>
-                    <a class="button button-secondary" href="https://github.com/deepclause/deepclause-sdk/tree/main/dml-examples" target="_blank" rel="noreferrer">Examples on GitHub</a>
-                </div>
-            </div>
-        </section>
+        <div class="container docs-shell">
+            <aside class="docs-sidebar">
+                <nav>
+                    <p class="sidebar-label">Guides</p>
+                    <a href="index.html">Documentation</a>
+                    <a href="speckit.html">SpecKit (SDD)</a>
+                    <a href="handbook.html">Handbook &rarr; DML</a>
+                    <p class="sidebar-label">Reference</p>
+                    <a href="dml-language-reference.html" class="active">DML reference</a>
+                    <a href="sdk.html">SDK &amp; CLI</a>
+                    <a href="sdk-api-reference.html">API reference</a>
+                    <a href="examples.html">Examples</a>
+                    <p class="sidebar-label">On this page</p>
+                    <a href="#at-a-glance">At a glance</a>
+                    <a href="#entry-points">Entry points</a>
+                    <a href="#llm-predicates">LLM predicates</a>
+                    <a href="#task-loop-semantics">Task loop semantics</a>
+                    <a href="#exec-and-tools">Exec and tools</a>
+                    <a href="#memory-and-control">Memory and control</a>
+                    <a href="#params-and-directives">Params and directives</a>
+                    <a href="#best-practices">Best practices</a>
+                </nav>
+            </aside>
 
-        <div class="container doc-layout">
-            <div class="doc-main">
+            <div class="docs-content">
+                <header class="docs-intro reveal">
+                    <p class="eyebrow">Reference</p>
+                    <h1>DML language reference</h1>
+                    <p class="docs-lead">
+                        DML is a Prolog-style language for agent workflows: declarative logic,
+                        backtracking, recursion, direct tool execution, and LLM-driven subtasks.
+                    </p>
+                    <div class="doc-actions">
+                        <a class="button button-secondary" href="index.html">Back to docs</a>
+                        <a class="button button-secondary" href="https://github.com/deepclause/deepclause-sdk/tree/main/dml-examples" target="_blank" rel="noreferrer">Examples on GitHub</a>
+                    </div>
+                </header>
                 <section id="at-a-glance" class="doc-section reveal">
                     <span class="section-kicker">At a Glance</span>
                     <h2>What DML is for</h2>
@@ -430,22 +444,6 @@ output("Processed {Count} files successfully.").</code></pre>
                         <li>Using the model for logic that could be encoded directly as a deterministic predicate.</li>
                     </ul>
                 </section>
-            </div>
-
-            <aside class="doc-toc reveal">
-                <section class="toc-card">
-                    <h2>On this page</h2>
-                    <ul class="toc-list">
-                        <li><a href="#at-a-glance">At a glance</a></li>
-                        <li><a href="#entry-points">Entry points</a></li>
-                        <li><a href="#llm-predicates">LLM predicates</a></li>
-                        <li><a href="#task-loop-semantics">Task loop semantics</a></li>
-                        <li><a href="#exec-and-tools">Exec and tools</a></li>
-                        <li><a href="#memory-and-control">Memory and control</a></li>
-                        <li><a href="#params-and-directives">Params and directives</a></li>
-                        <li><a href="#best-practices">Best practices</a></li>
-                    </ul>
-                </section>
                 <section class="doc-note">
                     <h3>Important current behavior</h3>
                     <p>
@@ -453,7 +451,7 @@ output("Processed {Count} files successfully.").</code></pre>
                         This page intentionally tracks the actual runtime rather than older prompt text that used earlier terminology.
                     </p>
                 </section>
-            </aside>
+            </div>
         </div>
     </main>
 
