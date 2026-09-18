@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DML language examples: failure-driven control flow, tools with nested LLM calls, tool scoping, knowledge bases, planning, and research agents.">
+    <title>DML language examples — DeepClause docs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../logo.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Docs</a>
+                <a href="speckit.html">SpecKit</a>
+                <a href="handbook.html">Handbook</a>
+                <a href="dml-language-reference.html">DML reference</a>
+                <a href="sdk.html">SDK &amp; CLI</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <div class="container docs-shell">
+            <aside class="docs-sidebar">
+                <nav>
+                    <p class="sidebar-label">Guides</p>
+                    <a href="index.html">Documentation</a>
+                    <a href="speckit.html">SpecKit (SDD)</a>
+                    <a href="handbook.html">Handbook &rarr; DML</a>
+                    <p class="sidebar-label">Reference</p>
+                    <a href="dml-language-reference.html">DML reference</a>
+                    <a href="sdk.html">SDK &amp; CLI</a>
+                    <a href="sdk-api-reference.html">API reference</a>
+                    <a href="dml-language-examples.html" class="active">DML language examples</a>
+                    <p class="sidebar-label">On this page</p>
+                    <a href="#run">Running examples</a>
+                    <a href="#index">Example index</a>
+                    <a href="#concepts">Key concepts</a>
+                </nav>
+            </aside>
+
+            <div class="docs-content">
+                <header class="docs-intro reveal">
+                    <p class="eyebrow">Examples</p>
+                    <h1>DML language examples</h1>
+                    <p class="docs-lead">
+                        Small, runnable DML programs that demonstrate the language: failure-driven
+                        control flow, tools with nested LLM calls, tool scoping, knowledge bases,
+                        constraint planning, and research agents.
+                    </p>
+                    <div class="doc-actions">
+                        <a class="button button-primary" href="https://github.com/deepclause/deepclause-sdk/tree/main/dml-examples" target="_blank" rel="noreferrer">Examples on GitHub</a>
+                        <a class="button button-secondary" href="dml-language-reference.html">DML reference</a>
+                    </div>
+                </header>
+
+                <section id="run" class="docs-section reveal">
+                    <h2>Running examples</h2>
+                    <pre><code>deepclause run dml-examples/&lt;example&gt;.dml
+
+# or from a checkout
+node dist/cli/index.js run dml-examples/&lt;example&gt;.dml</code></pre>
+                </section>
+
+                <section id="index" class="docs-section reveal">
+                    <h2>Example index</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Example</th><th>What it shows</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>test.dml</code></td><td>Minimal program structure</td></tr>
+                                <tr><td><code>vm-exec.dml</code></td><td>Executing external tools via <code>exec/2</code></td></tr>
+                                <tr><td><code>coding-agent.dml</code></td><td>Failure-driven control flow in a coding assistant</td></tr>
+                                <tr><td><code>knowledge-agent.dml</code></td><td>A shopping assistant backed by Prolog facts</td></tr>
+                                <tr><td><code>conversational-agent.dml</code></td><td>Minimal agent with web search and code execution</td></tr>
+                                <tr><td><code>nested-task-test.dml</code></td><td><code>task()</code> inside <code>tool/2</code> definitions</td></tr>
+                                <tr><td><code>tool-scoping-test.dml</code></td><td><code>with_tools/2</code> and <code>without_tools/2</code></td></tr>
+                                <tr><td><code>clpfd-planner.dml</code></td><td>Constraint planning with CLP(FD)</td></tr>
+                                <tr><td><code>deep_research.dml</code></td><td>Multi-step research with citations</td></tr>
+                                <tr><td><code>arxiv-researcher.dml</code></td><td>Literature search and review</td></tr>
+                                <tr><td><code>data-analysis.dml</code></td><td>Reading data and reporting results</td></tr>
+                                <tr><td><code>image-analyzer.dml</code></td><td>Multimodal analysis through tools</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="concepts" class="docs-section reveal">
+                    <h2>Key concepts</h2>
+
+                    <h3>Failure-driven control flow</h3>
+                    <p>Try each approach until one succeeds:</p>
+                    <pre><code>handle_task(Task) :-
+    approach_1(Task).
+handle_task(Task) :-
+    approach_2(Task).
+handle_task(_) :-
+    fallback_response.</code></pre>
+
+                    <h3>Tools with nested LLM calls</h3>
+                    <p>Tools can use <code>task/N</code> internally to combine deterministic logic with model reasoning:</p>
+                    <pre><code>tool(explain_calculation(A, B, Explanation)) :-
+    Sum is A + B,
+    format(string(Desc), "Explain ~w + ~w = ~w to a child", [A, B, Sum]),
+    task(Desc, Explanation).</code></pre>
+
+                    <h3>Tool scoping</h3>
+                    <p>Control which tools a nested task may use:</p>
+                    <pre><code>tool(restricted_task(Input, Output), "Only allows specific tools") :-
+    with_tools([tool_a, tool_b], (
+        format(string(Desc), "Process '~w' with limited tools", [Input]),
+        task(Desc, Output)
+    )).
+
+tool(safe_task(Input, Output), "Excludes dangerous tools") :-
+    without_tools([dangerous_tool], (
+        format(string(Desc), "Process '~w' safely", [Input]),
+        task(Desc, Output)
+    )).</code></pre>
+
+                    <h3>Knowledge base</h3>
+                    <p>Prolog facts and rules are a first-class knowledge base:</p>
+                    <pre><code>product("laptop", 999).
+product("monitor", 249).
+
+discounted(Item, Price, Discounted) :-
+    product(Item, Price),
+    Price &gt; 500,
+    Discounted is Price * 0.9.</code></pre>
+
+                    <p class="link-row">
+                        <a href="dml-language-reference.html">DML reference &rarr;</a>
+                        <a href="handbook.html">Handbook &rarr; DML &rarr;</a>
+                        <a href="https://github.com/deepclause/deepclause-sdk/tree/main/dml-examples" target="_blank" rel="noreferrer">All examples on GitHub &rarr;</a>
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Executable SOPs and specs for reliable, auditable agents.</p>
+            </div>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">SDK</a>
+                <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

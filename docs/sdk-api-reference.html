@@ -21,38 +21,49 @@
                 <a href="handbook.html">Handbook</a>
                 <a href="dml-language-reference.html">DML reference</a>
                 <a href="sdk.html">SDK &amp; CLI</a>
-                <a href="examples.html">Examples</a>
                 <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
             </nav>
         </div>
     </header>
 
     <main class="doc-page">
-        <section class="doc-hero">
-            <div class="container reveal">
-                <div class="breadcrumb">
-                    <a href="../index.html">Home</a>
-                    <span>/</span>
-                    <a href="index.html">Docs</a>
-                    <span>/</span>
-                    <a href="sdk-api-reference.html">SDK API Reference</a>
-                </div>
-                <p class="eyebrow">SDK API</p>
-                <h1>Type-shaped reference for the current SDK surface.</h1>
-                <p>
-                    This page follows the exported TypeScript surface from <code>deepclause-sdk</code>.
-                    It is meant to be reference-first: constructor shape, primary methods, option objects,
-                    tool registration contracts, and emitted event fields.
-                </p>
-                <div class="doc-actions">
-                    <a class="button button-primary" href="#constructor">Start with createDeepClause</a>
-                    <a class="button button-secondary" href="examples.html">See runnable examples</a>
-                </div>
-            </div>
-        </section>
+        <div class="container docs-shell">
+            <aside class="docs-sidebar">
+                <nav>
+                    <p class="sidebar-label">Guides</p>
+                    <a href="index.html">Documentation</a>
+                    <a href="speckit.html">SpecKit (SDD)</a>
+                    <a href="handbook.html">Handbook &rarr; DML</a>
+                    <p class="sidebar-label">Reference</p>
+                    <a href="dml-language-reference.html">DML reference</a>
+                    <a href="sdk.html">SDK &amp; CLI</a>
+                    <a href="sdk-api-reference.html" class="active">API reference</a>
+                    <a href="dml-language-examples.html">DML language examples</a>
+                    <p class="sidebar-label">On this page</p>
+                    <a href="#package-surface">Package surface</a>
+                    <a href="#constructor">Constructor</a>
+                    <a href="#methods">Methods</a>
+                    <a href="#run-options">runDML options</a>
+                    <a href="#compile-options">Compile options</a>
+                    <a href="#tools-and-policy">Tools and policy</a>
+                    <a href="#events">Events</a>
+                    <a href="#compaction">Compaction</a>
+                </nav>
+            </aside>
 
-        <div class="container doc-layout">
-            <div class="doc-main">
+            <div class="docs-content">
+                <header class="docs-intro reveal">
+                    <p class="eyebrow">Reference</p>
+                    <h1>SDK API reference</h1>
+                    <p class="docs-lead">
+                        The exported TypeScript surface from <code>deepclause-sdk</code>: constructor,
+                        methods, option objects, tool registration contracts, and emitted event fields.
+                    </p>
+                    <div class="doc-actions">
+                        <a class="button button-secondary" href="index.html">Back to docs</a>
+                        <a class="button button-secondary" href="dml-language-examples.html">See runnable examples</a>
+                    </div>
+                </header>
                 <section id="package-surface" class="doc-section reveal">
                     <span class="section-kicker">Package Surface</span>
                     <h2>Primary exports</h2>
@@ -450,30 +461,15 @@ dc.setToolPolicy({
                         <li><code>CompactorBinding</code> attaches one compactor to a runtime scope and trigger pair.</li>
                     </ul>
                 </section>
-            </div>
-
-            <aside class="doc-toc reveal">
-                <section class="toc-card">
-                    <h2>On this page</h2>
-                    <ul class="toc-list">
-                        <li><a href="#package-surface">Package surface</a></li>
-                        <li><a href="#constructor">Constructor</a></li>
-                        <li><a href="#methods">Methods</a></li>
-                        <li><a href="#run-options">runDML options</a></li>
-                        <li><a href="#compile-options">compile options</a></li>
-                        <li><a href="#tools-and-policy">Tools and policy</a></li>
-                        <li><a href="#events">Events</a></li>
-                        <li><a href="#compaction">Compaction</a></li>
-                    </ul>
-                </section>
                 <section class="doc-note">
                     <h3>Reference style</h3>
                     <p>
-                        This page is deliberately type-first. For workflow guidance, use the docs landing page.
-                        For runnable snippets, use the examples page.
+                        This page is deliberately type-first. For workflow guidance, start from the
+                        <a href="index.html">docs home</a>. For runnable snippets, see the
+                        <a href="dml-language-examples.html">DML language examples</a>.
                     </p>
                 </section>
-            </aside>
+            </div>
         </div>
     </main>
 
@@ -485,7 +481,6 @@ dc.setToolPolicy({
             </div>
             <div class="footer-links">
                 <a href="index.html">Docs</a>
-                <a href="examples.html">Examples</a>
                 <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
                 <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
             </div>
