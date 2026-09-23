@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Decision models in DeepClause: route bounded semantic decisions to a calibrated model like Jev (TypeSafe System One), with typed choose/rate/verify/probability answers, capability gating, and LLM fallback.">
+    <title>Decision models — DeepClause docs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../logo.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Docs</a>
+                <a href="sop2harness.html">sop2harness</a>
+                <a href="pi-extension.html">pi extension</a>
+                <a href="dml-language-reference.html">DML reference</a>
+                <a href="sdk.html">DML SDK/CLI</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <div class="container docs-shell">
+            <aside class="docs-sidebar">
+                <nav>
+                    <p class="sidebar-label">Guides</p>
+                    <a href="index.html">Documentation</a>
+                    <a href="sop2harness.html">sop2harness</a>
+                    <a href="pi-extension.html">pi extension</a>
+                    <a href="speckit.html" class="tree-1">SDD &middot; SpecKit</a>
+                    <a href="handbook.html" class="tree-1">Handbook &rarr; DML</a>
+                    <a href="dml-sdk-guide.html">DML SDK &amp; CLI</a>
+                    <a href="decision-models.html" class="active">Decision models</a>
+                    <p class="sidebar-label">Reference</p>
+                    <a href="dml-language-reference.html">DML language reference</a>
+                    <a href="dml-language-examples.html">DML language examples</a>
+                    <a href="sdk.html">DML SDK/CLI</a>
+                    <a href="sdk-api-reference.html" class="tree-1">API reference</a>
+                    <a href="sop2harness-cli.html">Sop2Harness CLI</a>
+                    <p class="sidebar-label">On this page</p>
+                    <a href="#what">What a decision model is</a>
+                    <a href="#predicates">DML predicates</a>
+                    <a href="#backends">Backends</a>
+                    <a href="#gating">Capability gating</a>
+                    <a href="#configure">Configure the SDK</a>
+                    <a href="#pi">In the pi extension</a>
+                    <a href="#policy">Evidence, not authorization</a>
+                    <a href="#links">Links</a>
+                </nav>
+            </aside>
+
+            <div class="docs-content">
+                <header class="docs-intro reveal">
+                    <p class="eyebrow">Guide &middot; Decision models</p>
+                    <h1>Decision models</h1>
+                    <p class="docs-lead">
+                        DML separates generation from decision. Alongside <code>task/N</code> and
+                        <code>prompt/N</code>, it can route a bounded semantic decision to a
+                        <strong>decision model</strong> and branch on a typed answer. Your active
+                        model is the default; <strong>Jev (TypeSafe System One)</strong> is the
+                        calibrated backend.
+                    </p>
+                    <div class="doc-actions">
+                        <a class="button button-primary" href="dml-sdk-guide.html">DML SDK &amp; CLI guide</a>
+                        <a class="button button-secondary" href="dml-language-reference.html">DML language reference</a>
+                        <a class="button button-secondary" href="sdk-api-reference.html">API reference</a>
+                    </div>
+                </header>
+
+                <section id="what" class="docs-section reveal">
+                    <h2>What a decision model is</h2>
+                    <p>
+                        A decision model answers a small, closed question about an explicit state.
+                        It never writes prose and never sees prior memory, so its answer is bounded
+                        and reproducible. Every decision is one of four kinds:
+                    </p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Kind</th><th>Answers</th><th>DML value</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>choose</code></td><td>One of a closed set of options</td><td>The option atom</td></tr>
+                                <tr><td><code>rate</code></td><td>One of an ordered list of levels</td><td>The level atom</td></tr>
+                                <tr><td><code>verify</code></td><td>A yes/no proposition</td><td><code>yes</code> | <code>no</code> | <code>unknown</code></td></tr>
+                                <tr><td><code>probability</code></td><td>A yes/no proposition</td><td>A number in <code>[0, 1]</code></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>
+                        Because answers are constrained to the options and levels you supply,
+                        downstream logic never has to parse free text or guess at a label.
+                    </p>
+                </section>
+
+                <section id="predicates" class="docs-section reveal">
+                    <h2>DML predicates</h2>
+                    <p>Ask several questions in one batched call with <code>judge/2</code>, and bind the answers in order:</p>
+                    <pre><code>judge(Message, [
+    choose("Which team should handle this?",
+           [billing-"Charges and refunds", orders-"Delivery", account-"Login"]) - Team,
+    rate("How frustrated is the customer?", [calm, frustrated, angry]) - Frustration,
+    verify("Does the message ask for a refund?") - Refund,
+    probability("Is this urgent?") - Urgency
+]),
+(   Refund == yes, Team == billing
+->  answer("Escalating to the refund queue.")
+;   format(string(R), "route=~w frustration=~w urgency=~w", [Team, Frustration, Urgency]),
+    answer(R)
+).</code></pre>
+                    <p>One-off predicates are also available:</p>
+                    <pre><code>choose(State, Question, Options, Choice)
+rate(State, Question, Levels, Level)
+verify(State, Question, Truth)          % yes | no | unknown
+probability(State, Question, P)         % number in [0, 1]
+holds(State, Question)                  % succeeds when verify == yes
+holds(State, Question, Threshold)       % succeeds when probability &gt;= Threshold</code></pre>
+                    <p class="footnote">
+                        Judgments are memoized per run by backend, model, state, and questions, so
+                        backtracking reuses an answer instead of re-sampling the model.
+                    </p>
+                </section>
+
+                <section id="backends" class="docs-section reveal">
+                    <h2>Backends</h2>
+                    <p>Decision predicates are implemented by swappable backends. Each declares its capabilities, and the answer carries its <code>basis</code>.</p>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Backend</th><th>Calibrated</th><th>Probability</th><th>Credentials</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>llm</code> (default)</td><td>no</td><td>self-reported</td><td>pi's active model and credentials</td></tr>
+                                <tr><td><code>jev</code></td><td>yes</td><td>calibrated</td><td><code>TYPESAFE_API_KEY</code></td></tr>
+                                <tr><td><code>mock</code> / <code>mockJev</code></td><td>no / yes</td><td>yes</td><td>none</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p>
+                        The <code>llm</code> backend is the default, so decision predicates work with
+                        no new credentials. <strong>Jev (TypeSafe System One)</strong> is opt-in and
+                        adds calibrated probabilities, confidence, independent questions, and
+                        structured criteria. The SDK never reads or stores credentials: the API key
+                        is supplied by the caller. A <code>mockJev</code> backend advertises Jev-like
+                        calibrated capabilities so the calibrated path can be developed and tested
+                        without a key.
+                    </p>
+                </section>
+
+                <section id="gating" class="docs-section reveal">
+                    <h2>Capability gating</h2>
+                    <p>
+                        A skill that depends on calibration should fail clearly rather than silently
+                        run on an uncalibrated backend. <code>require_judgment/2</code> records a
+                        required capability, and <code>with_judgment/2</code> scopes a named backend
+                        to a goal.
+                    </p>
+                    <pre><code>% Scope a calibrated backend to this decision.
+with_judgment(jev, decide(State, Decision)).
+
+% Fail at the next judgment if 'calibrated' is unavailable.
+require_judgment(calibrated, (
+    probability("Is this urgent?", P),
+    (P &gt;= 0.8 -&gt; escalate(State) ; standard(State))
+)).</code></pre>
+                </section>
+
+                <section id="configure" class="docs-section reveal">
+                    <h2>Configure the SDK</h2>
+                    <pre><code>import {
+  createDeepClause,
+  createLLMJudgeBackend,
+  createJevJudgeBackend,
+  createMockJevJudgeBackend,
+} from "deepclause-sdk";
+
+const sdk = await createDeepClause({
+  model,
+  llmBackend,
+  judgeBackends: {
+    llm: createLLMJudgeBackend({ llmBackend }),
+    jev: createJevJudgeBackend({ apiKey: process.env.TYPESAFE_API_KEY }),
+    mock: createMockJevJudgeBackend(),
+  },
+  defaultJudge: "llm",
+});</code></pre>
+                    <p>
+                        The backend used by a judgment resolves in this order:
+                        <code>with_judgment/2</code> scope, then a per-run override, then
+                        <code>defaultJudge</code>, then the first registered backend.
+                        <code>sdk.getJudgeCapabilities()</code> reports what the active backend can
+                        do.
+                    </p>
+                </section>
+
+                <section id="pi" class="docs-section reveal">
+                    <h2>In the pi extension</h2>
+                    <p>
+                        Enable Jev in <code>.pi/deepclause/config.json</code>; the extension reads
+                        the key from the named environment variable and never stores it.
+                    </p>
+                    <pre><code>{
+  "judgment": {
+    "default": "llm",
+    "jev": {
+      "enabled": true,
+      "model": "jev-latest",
+      "apiKeyEnv": "TYPESAFE_API_KEY"
+    }
+  }
+}</code></pre>
+                    <p>Then select the backend per run or as the default:</p>
+                    <pre><code>/dc-run skills/triage.dml --judge=jev
+/dc-judge enable
+/dc-judge default jev</code></pre>
+                    <p class="footnote">If Jev is enabled but the key is missing, the extension warns and falls back to <code>llm</code>.</p>
+                </section>
+
+                <section id="policy" class="docs-section reveal">
+                    <h2>Evidence, not authorization</h2>
+                    <p>
+                        A decision model produces evidence; DML owns policy. Thresholds, weights,
+                        routing, and every side effect stay in Prolog. Calibrated probabilities can
+                        inform a decision, but money-moving or irreversible actions keep their hard
+                        gates and human approvals — and a skill that requires a calibrated backend
+                        falls back to its fallback clause when that backend is unavailable.
+                    </p>
+                </section>
+
+                <section id="links" class="docs-section reveal">
+                    <h2>Links</h2>
+                    <p class="link-row">
+                        <a href="https://github.com/deepclause/deepclause-sdk/blob/main/docs/JUDGMENT_BACKENDS.md" target="_blank" rel="noreferrer">Judgment backends reference &rarr;</a>
+                        <a href="https://github.com/deepclause/deepclause-sdk/blob/main/docs/JUDGE_EXAMPLES.md" target="_blank" rel="noreferrer">Worked judgment examples &rarr;</a>
+                        <a href="dml-sdk-guide.html">DML SDK &amp; CLI guide &rarr;</a>
+                        <a href="sdk-api-reference.html">API reference &rarr;</a>
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Executable SOPs and specs for reliable, auditable agents.</p>
+            </div>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="https://github.com/deepclause/sop2harness" target="_blank" rel="noreferrer">sop2harness</a>
+                <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">DML SDK</a>
+                <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

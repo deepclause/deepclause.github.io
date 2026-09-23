@@ -37,6 +37,7 @@
                     <a href="speckit.html" class="tree-1">SDD &middot; SpecKit</a>
                     <a href="handbook.html" class="tree-1">Handbook &rarr; DML</a>
                     <a href="dml-sdk-guide.html" class="active">DML SDK &amp; CLI</a>
+                    <a href="decision-models.html">Decision models</a>
                     <p class="sidebar-label">Reference</p>
                     <a href="dml-language-reference.html">DML language reference</a>
                     <a href="dml-language-examples.html">DML language examples</a>
@@ -50,6 +51,7 @@
                     <a href="#embed">Embed in TypeScript</a>
                     <a href="#tools">Tools and the whitelist</a>
                     <a href="#models">Models and providers</a>
+                    <a href="#decision-models">Decision models</a>
                     <a href="#sandbox">Sandboxing</a>
                     <a href="#ci">Use it in CI</a>
                     <a href="#next">Next steps</a>
@@ -205,6 +207,38 @@ deepclause set-model custom:local:qwen3-32b --slot run</code></pre>
                     <p class="footnote">
                         Works with Ollama, vLLM, LM Studio, or any endpoint that speaks an
                         OpenAI-style chat/completions API.
+                    </p>
+                </section>
+
+                <section id="decision-models" class="docs-section reveal">
+                    <h2>Decision models</h2>
+                    <p>
+                        Besides generation, DML can route a bounded semantic decision to a
+                        <strong>decision model</strong>. Register backends with
+                        <code>judgeBackends</code> and select one with <code>defaultJudge</code>:
+                    </p>
+                    <pre><code>import {
+  createDeepClause,
+  createLLMJudgeBackend,
+  createJevJudgeBackend,
+} from "deepclause-sdk";
+
+const sdk = await createDeepClause({
+  model,
+  llmBackend,
+  judgeBackends: {
+    llm: createLLMJudgeBackend({ llmBackend }),
+    jev: createJevJudgeBackend({ apiKey: process.env.TYPESAFE_API_KEY }),
+  },
+  defaultJudge: "llm",
+});</code></pre>
+                    <p>
+                        The <code>llm</code> backend is the default, so the <code>choose</code>,
+                        <code>rate</code>, <code>verify</code>, and <code>probability</code>
+                        predicates work with no new credentials. <strong>Jev (TypeSafe System
+                        One)</strong> is the opt-in calibrated backend. See
+                        <a href="decision-models.html">Decision models</a> for the DML surface,
+                        capability gating, and configuration.
                     </p>
                 </section>
 

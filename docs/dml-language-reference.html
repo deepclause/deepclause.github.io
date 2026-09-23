@@ -37,6 +37,7 @@
                     <a href="speckit.html" class="tree-1">SDD &middot; SpecKit</a>
                     <a href="handbook.html" class="tree-1">Handbook &rarr; DML</a>
                     <a href="dml-sdk-guide.html">DML SDK &amp; CLI</a>
+                    <a href="decision-models.html">Decision models</a>
                     <p class="sidebar-label">Reference</p>
                     <a href="dml-language-reference.html" class="active">DML language reference</a>
                     <a href="dml-language-examples.html">DML language examples</a>
@@ -47,6 +48,7 @@
                     <a href="#at-a-glance">At a glance</a>
                     <a href="#entry-points">Entry points</a>
                     <a href="#llm-predicates">LLM predicates</a>
+                    <a href="#decision-predicates">Decision predicates</a>
                     <a href="#task-loop-semantics">Task loop semantics</a>
                     <a href="#exec-and-tools">Exec and tools</a>
                     <a href="#memory-and-control">Memory and control</a>
@@ -195,6 +197,28 @@ task("Return a floating-point score.", number(Score)).</code></pre>
     prompt("Critique this draft from a skeptical perspective: {Draft}", Critique),
     task("Revise the draft using this critique: {Critique}", Final),
     answer(Final).</code></pre>
+                </section>
+
+                <section id="decision-predicates" class="doc-section reveal">
+                    <span class="section-kicker">Decision Models</span>
+                    <h2>Bounded decisions come from <code>judge()</code>, not prose</h2>
+                    <p>
+                        Alongside generation, DML can ask a closed semantic question and branch on
+                        a typed answer. A decision is <code>choose</code> (one of a set of
+                        options), <code>rate</code> (one of ordered levels), <code>verify</code>
+                        (<code>yes</code>/<code>no</code>/<code>unknown</code>), or
+                        <code>probability</code> (a number in <code>[0, 1]</code>).
+                    </p>
+                    <pre><code>judge(Message, [
+    choose("Which team?", [billing, orders, account]) - Team,
+    probability("Is this urgent?") - Urgency
+]),
+(Urgency &gt;= 0.8 -&gt; escalate(Team) ; route(Team)).</code></pre>
+                    <p>
+                        Answers are produced by a pluggable backend: your active LLM by default, or
+                        a calibrated decision model like <strong>Jev (TypeSafe System One)</strong>.
+                        See <a href="decision-models.html">decision models &rarr;</a>.
+                    </p>
                 </section>
 
                 <section id="task-loop-semantics" class="doc-section reveal">
