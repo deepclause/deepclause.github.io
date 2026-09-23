@@ -412,6 +412,7 @@ kbd {
   display: block;
   font-size: 0.88rem;
   padding: 5px 10px;
+  position: relative;
 }
 
 .docs-sidebar a:hover {
@@ -424,6 +425,71 @@ kbd {
   border-left-color: var(--accent);
   color: var(--accent-strong);
   font-weight: 600;
+}
+
+/* nested tree items in the sidebar */
+.docs-sidebar a.tree-1 {
+  font-size: 0.84rem;
+  padding-left: 26px;
+}
+
+.docs-sidebar a.tree-1::before {
+  border-left: 1px solid var(--line);
+  bottom: 4px;
+  content: "";
+  left: 14px;
+  position: absolute;
+  top: 4px;
+}
+
+.docs-sidebar a.tree-1.active::before {
+  border-left-color: var(--accent);
+}
+
+/* reference tree on the docs home */
+.ref-tree {
+  display: grid;
+  gap: 2px;
+  margin-top: 16px;
+}
+
+.ref-row {
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 2px;
+  padding: 12px 0;
+  position: relative;
+}
+
+.ref-row:last-child {
+  border-bottom: 0;
+}
+
+.ref-row.tree-1 {
+  padding-left: 26px;
+}
+
+.ref-row.tree-1::before {
+  border-left: 1px solid var(--line);
+  bottom: 10px;
+  content: "";
+  left: 12px;
+  position: absolute;
+  top: 10px;
+}
+
+.ref-row a {
+  color: var(--accent-strong);
+  font-weight: 600;
+}
+
+.ref-row a:hover {
+  text-decoration: underline;
+}
+
+.ref-row span {
+  color: var(--muted);
+  font-size: 0.88rem;
 }
 
 .docs-content {

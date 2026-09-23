@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="DeepClause documentation. Spec-driven development with SpecKit for pi, and SOP2Agent: turn SOPs into auditable DML agents. DML language reference, SDK and CLI.">
+    <meta name="description" content="DeepClause documentation: sop2harness, the CLI that turns SOPs into a versioned harness, and the pi extension for SDD (SpecKit) and Handbook to DML. Plus the DML language references, the DML SDK/CLI, and the Sop2Harness CLI.">
     <title>DeepClause Documentation</title>
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="docs.css">
@@ -17,10 +17,10 @@
             </a>
             <nav class="site-nav">
                 <a href="index.html">Docs</a>
-                <a href="speckit.html">SpecKit</a>
-                <a href="handbook.html">Handbook</a>
+                <a href="sop2harness.html">sop2harness</a>
+                <a href="pi-extension.html">pi extension</a>
                 <a href="dml-language-reference.html">DML reference</a>
-                <a href="sdk.html">SDK &amp; CLI</a>
+                <a href="sdk.html">DML SDK/CLI</a>
                 <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
             </nav>
         </div>
@@ -32,16 +32,17 @@
                 <nav>
                     <p class="sidebar-label">Guides</p>
                     <a href="index.html" class="active">Documentation</a>
-                    <a href="speckit.html">SpecKit (SDD)</a>
-                    <a href="handbook.html">Handbook &rarr; DML</a>
+                    <a href="sop2harness.html">sop2harness</a>
+                    <a href="pi-extension.html">pi extension</a>
+                    <a href="speckit.html" class="tree-1">SDD &middot; SpecKit</a>
+                    <a href="handbook.html" class="tree-1">Handbook &rarr; DML</a>
+                    <a href="dml-sdk-guide.html">DML SDK &amp; CLI</a>
                     <p class="sidebar-label">Reference</p>
-                    <a href="dml-language-reference.html">DML reference</a>
-                    <a href="sdk.html">SDK &amp; CLI</a>
-                    <a href="sdk-api-reference.html">API reference</a>
+                    <a href="dml-language-reference.html">DML language reference</a>
                     <a href="dml-language-examples.html">DML language examples</a>
-                    <p class="sidebar-label">External</p>
-                    <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension &#8599;</a>
-                    <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">SDK &#8599;</a>
+                    <a href="sdk.html">DML SDK/CLI</a>
+                    <a href="sdk-api-reference.html" class="tree-1">API reference</a>
+                    <a href="sop2harness-cli.html">Sop2Harness CLI</a>
                 </nav>
             </aside>
 
@@ -55,82 +56,130 @@
                         artifact is reviewable.
                     </p>
                     <div class="doc-actions">
-                        <a class="button button-primary" href="#get-started">Get started with pi</a>
+                        <a class="button button-primary" href="#get-started">Get started with sop2harness</a>
+                        <a class="button button-secondary" href="pi-extension.html">pi extension</a>
                         <a class="button button-secondary" href="dml-language-reference.html">DML reference</a>
-                        <a class="button button-secondary" href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">GitHub</a>
                     </div>
                 </header>
 
                 <section id="main" class="docs-section reveal">
-                    <h2>Two main things</h2>
+                    <h2>Two main functions</h2>
                     <p>
-                        There are two ways to use DeepClause: <strong>SDD with SpecKit</strong> for
-                        software changes, and <strong>SOP2Agent</strong> for operational procedures
-                        and policies. Both run on the same DML runtime inside pi.
+                        DeepClause has two main functions: <strong>sop2harness</strong>, the CLI
+                        that turns SOPs into a versioned harness, and the
+                        <strong>pi extension</strong>, which authors and runs DML inside a pi
+                        session. Both share one DML runtime and one harness format.
                     </p>
                     <div class="pillar-grid">
                         <article class="pillar">
-                            <span class="pillar-kicker">SDD &middot; SpecKit for pi</span>
-                            <h3>Spec-driven changes in the session</h3>
+                            <span class="pillar-kicker">sop2harness &middot; CLI</span>
+                            <h3>Turn SOPs into a versioned harness</h3>
                             <p>
-                                Specs describe behaviour. A change is a reviewed proposal with delta
-                                specs and an executable task plan. Parsing, validation, merging and
-                                coverage are deterministic DML.
+                                <code>s2h</code> scaffolds a project, authors one validated DML
+                                Skill per procedure through a pi session, versions the harness, and
+                                exports it as a self-hosted API, web chat, and MCP server.
                             </p>
                             <ul>
-                                <li>0-token validation with <code>/dc-check</code></li>
-                                <li>Snapshot, resume, and abort on <code>/dc-apply</code></li>
-                                <li>Specs under <code>specs/</code> are the source of truth</li>
+                                <li><code>s2h create</code> authors Skills from SOPs</li>
+                                <li><code>s2h commit</code> validates, versions, and tags</li>
+                                <li><code>s2h export</code> produces API + chat + MCP + Docker</li>
                             </ul>
-                            <a class="pillar-link" href="speckit.html">Read the SpecKit guide &rarr;</a>
+                            <a class="pillar-link" href="sop2harness.html">Read the sop2harness guide &rarr;</a>
                         </article>
                         <article class="pillar">
-                            <span class="pillar-kicker">SOP2Agent &middot; Handbook &rarr; DML</span>
-                            <h3>Turn SOPs into auditable agents</h3>
+                            <span class="pillar-kicker">pi extension &middot; in-session</span>
+                            <h3>Author and run DML in pi</h3>
                             <p>
-                                A long handbook becomes one auditable DML policy per workflow:
-                                deterministic rules for money, thresholds and deadlines, scoped LLM
-                                steps for reading and drafting, and verified post-conditions.
+                                The pi extension turns a coding session into a DML authoring and
+                                execution environment. It ships two workflows, both producing DML
+                                for the same runtime.
                             </p>
                             <ul>
-                                <li>Forbidden actions have no tool</li>
-                                <li>Deterministic amounts, thresholds, deadlines</li>
-                                <li>Verified <code>PASS</code>/<code>FAIL</code> against post-conditions</li>
+                                <li><a href="speckit.html">SDD &middot; SpecKit</a> &mdash; spec-driven changes</li>
+                                <li><a href="handbook.html">Handbook &rarr; DML</a> &mdash; SOPs into DML policies</li>
                             </ul>
-                            <a class="pillar-link" href="handbook.html">Read the handbook guide &rarr;</a>
+                            <a class="pillar-link" href="pi-extension.html">Read the pi extension guide &rarr;</a>
                         </article>
                     </div>
                     <p class="pillar-foundation">
-                        Both run on the same DML runtime in pi: one model, one session, one audit
-                        trail. See the <a href="dml-language-reference.html">DML reference</a> for the language.
+                        Both share one DML runtime: one model, one audit trail. See the
+                        <a href="dml-language-reference.html">DML language reference</a> and the
+                        <a href="sdk.html">DML SDK/CLI</a>.
+                    </p>
+                    <p class="footnote">
+                        Not using pi or sop2harness? Run and embed DML directly with the
+                        <a href="dml-sdk-guide.html">DML SDK &amp; CLI guide</a>.
                     </p>
                 </section>
 
                 <section id="get-started" class="docs-section reveal">
-                    <h2>Quick start</h2>
-                    <pre><code>pi install git:github.com/deepclause/deepclause-pi</code></pre>
-                    <ol>
-                        <li><code>/dc</code> initializes <code>.pi/deepclause</code> in the workspace.</li>
-                        <li>For a software change: <code>/dc-plan "add SSO" --change=sso</code>, then <code>/dc-check</code>, <code>/dc-apply</code>, <code>/dc-archive</code>.</li>
-                        <li>For an SOP: ask pi to turn the handbook into DML, then run <code>/dc-run skills/&lt;policy&gt;.dml</code>.</li>
-                    </ol>
+                    <h2>Get started</h2>
+                    <p>One CLI from SOP to a versioned harness &mdash; then embed the runtime anywhere.</p>
+                    <div class="card-grid three-up">
+                        <article class="info-card accent-card">
+                            <h3>sop2harness CLI <span class="tag">recommended</span></h3>
+                            <pre class="snippet"><code>npm install -g deepclause-sop2harness
+
+s2h init
+s2h create "Turn this SOP into a harness"
+s2h commit -m "add triage workflow"
+s2h export --out ./export</code></pre>
+                            <p>Scaffold, author through a pi session, version, and export a self-hosted API, web chat, and MCP server.</p>
+                            <p><a href="sop2harness.html">sop2harness guide &rarr;</a></p>
+                        </article>
+                        <article class="info-card">
+                            <h3>pi extension</h3>
+                            <pre class="snippet"><code>pi install \
+  git:github.com/deepclause/deepclause-pi</code></pre>
+                            <p>Author and run DML in your session with SDD (SpecKit) and the Handbook&nbsp;&rarr;&nbsp;DML skill. Uses pi's model and credentials.</p>
+                            <p><a href="pi-extension.html">pi extension guide &rarr;</a></p>
+                        </article>
+                        <article class="info-card">
+                            <h3>TypeScript SDK</h3>
+                            <pre class="snippet"><code>import { createDeepClause } from "deepclause-sdk";
+
+const dc = await createDeepClause({
+  model: "host-active-model",
+  llmBackend, // your model
+});</code></pre>
+                            <p>Embed the DML runtime in your own service with a host-provided model backend; no provider keys required.</p>
+                            <p><a href="dml-sdk-guide.html">DML SDK &amp; CLI guide &rarr;</a></p>
+                        </article>
+                    </div>
+                    <div class="mini-note">
+                        <strong>Other agents and hosts:</strong> use the exported MCP server, the
+                        <code>s2h</code> CLI, or the SDK's injectable model backend. The runtime tool
+                        whitelist stays explicit.
+                    </div>
+                    <p class="link-row">
+                        <a href="sop2harness-cli.html">Sop2Harness CLI reference &rarr;</a>
+                        <a href="sop2harness.html#example">A concrete sop2harness example &rarr;</a>
+                    </p>
                 </section>
 
                 <section id="reference" class="docs-section reveal">
                     <h2>Reference</h2>
-                    <div class="reference-grid">
-                        <a href="dml-language-reference.html">
-                            <strong>DML reference</strong>
+                    <div class="ref-tree">
+                        <div class="ref-row">
+                            <a href="dml-language-reference.html">DML language reference</a>
                             <span>The language: task/prompt, exec, tools, memory, control flow.</span>
-                        </a>
-                        <a href="sdk.html">
-                            <strong>SDK &amp; CLI</strong>
-                            <span>Embed DeepClause in TypeScript or run it headless.</span>
-                        </a>
-                        <a href="dml-language-examples.html">
-                            <strong>DML language examples</strong>
+                        </div>
+                        <div class="ref-row">
+                            <a href="dml-language-examples.html">DML language examples</a>
                             <span>Validated example skills and generated plans.</span>
-                        </a>
+                        </div>
+                        <div class="ref-row">
+                            <a href="sdk.html">DML SDK/CLI</a>
+                            <span>Embed the runtime in TypeScript or run it headless.</span>
+                        </div>
+                        <div class="ref-row tree-1">
+                            <a href="sdk-api-reference.html">API reference</a>
+                            <span>Constructor, methods, options, tools, and events.</span>
+                        </div>
+                        <div class="ref-row">
+                            <a href="sop2harness-cli.html">Sop2Harness CLI</a>
+                            <span>init, create, commit, export, and helpers.</span>
+                        </div>
                     </div>
                 </section>
             </div>
@@ -146,8 +195,9 @@
             <div class="footer-links">
                 <a href="../index.html">Home</a>
                 <a href="index.html">Docs</a>
+                <a href="https://github.com/deepclause/sop2harness" target="_blank" rel="noreferrer">sop2harness</a>
                 <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
-                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">SDK</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">DML SDK</a>
                 <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
             </div>
         </div>

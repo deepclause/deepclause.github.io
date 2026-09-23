@@ -1,64 +1,146 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ---- hero terminal animation ----
+    // ---- mermaid diagrams ----
+    if (window.mermaid) {
+        window.mermaid.initialize({
+            startOnLoad: false,
+            securityLevel: 'loose',
+            theme: 'base',
+            flowchart: {
+                curve: 'basis',
+                htmlLabels: true,
+                nodeSpacing: 45,
+                rankSpacing: 72,
+                padding: 14,
+                useMaxWidth: true
+            },
+            themeVariables: {
+                fontFamily: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+                fontSize: '15px',
+                primaryColor: '#ffffff',
+                primaryTextColor: '#16181d',
+                primaryBorderColor: '#cac2b4',
+                lineColor: '#0a7a8c',
+                secondaryColor: '#f1eee7',
+                tertiaryColor: '#eef6f7',
+                edgeLabelBackground: '#f7f5f0'
+            }
+        });
+
+        window.mermaid.run({ querySelector: '.mermaid' }).catch((error) => {
+            console.error('mermaid render failed', error);
+        });
+    }
+
+    // ---- hero terminal + chat animation ----
     const terminalContent = document.getElementById('terminal-content');
-    const sequence = [
-        { text: '$ pi install git:github.com/deepclause/deepclause-pi', type: 'command', delay: 440 },
-        { text: 'installed pi package deepclause-pi', type: 'muted', delay: 260 },
-        { text: '$ pi', type: 'command', delay: 380 },
-        { text: '> Resolve case AA45175 per the overpayment SOP.', type: 'command', delay: 580 },
-        { text: '[deepclause] disposition: $1,275 overpaid', type: 'output', delay: 320 },
-        { text: '             re-class $425 + refund $850', type: 'output', delay: 280 },
-        { text: '[deepclause] verify: PASS — 7/7 post-conditions', type: 'output', delay: 400 },
-        { text: '> Show me a diagram of the policy.', type: 'command', delay: 580 },
-        { text: '[deepclause] rendering presentation + spec diagrams', type: 'muted', delay: 340 },
-        { text: ' +---------+   +---------+   +---------+', type: 'diagram', delay: 90 },
-        { text: ' | request |-->| compute |-->| verify  |', type: 'diagram', delay: 90 },
-        { text: ' +---------+   +---------+   +---------+', type: 'diagram', delay: 90 },
-        { text: '    |             |             |', type: 'diagram', delay: 90 },
-        { text: '    +--- rules ---+--- state ---+', type: 'diagram', delay: 360 },
-        { text: '[deepclause] opening diagrams/viewer.html', type: 'output', delay: 420 },
-        { text: 'Done. Two views ready; click to enlarge.', type: 'output', delay: 1500 }
+    const chatContent = document.getElementById('chat-content');
+    const heroTitle = document.getElementById('hero-title');
+    const heroMeta = document.getElementById('hero-meta');
+
+    const cliLines = [
+        { text: '$ npm install -g deepclause-sop2harness', type: 'command', delay: 520 },
+        { text: 'added 1 package in 2s', type: 'muted', delay: 400 },
+        { text: '$ s2h init', type: 'command', delay: 460 },
+        { text: 'scaffolded harness/ · seeded .pi/deepclause/', type: 'output', delay: 500 },
+        { text: '$ s2h create "Turn our antenatal care SOP into a harness" --file ./sops/anc-guidelines.pdf', type: 'command', delay: 950 },
+        { text: 'ingested anc-guidelines.pdf · pi session authoring skills/anc-routine-care.dml', type: 'diagram', delay: 700 },
+        { text: 'validated 3 skills · wrote harness.json + AGENTS.md', type: 'output', delay: 620 },
+        { text: '$ s2h commit -m "add antenatal care workflow"', type: 'command', delay: 700 },
+        { text: 'harness v0.1.0 · tagged', type: 'output', delay: 520 },
+        { text: '$ s2h export --out ./export', type: 'command', delay: 700 },
+        { text: 'API + web chat + MCP server + Dockerfile', type: 'output', delay: 1400 }
+    ];
+
+    const chatScript = [
+        { role: 'user', text: 'First antenatal visit: 26y, 10 weeks, no prior complications.', delay: 680 },
+        { role: 'route', text: 'route: anc-routine-care (trigger)', delay: 520 },
+        { role: 'assistant', text: 'Decision: routine care — no referral.\n\nPlan (ANC SOP §4.2):\n1. Booking bloods: FBC, group & Rh, HbA1c, HIV, syphilis, HBsAg.\n2. Folic acid 5 mg + iron/folate; calcium if intake is low.\n3. Visits: 4 by 28 wks, 2-weekly to 36, then weekly.\n4. Verify 4/4 post-conditions, then book the next visit.', type: true, delay: 1400 },
+        { role: 'usage', text: '1,842 in · 318 out · 3.4s', delay: 2600 }
     ];
 
     function wait(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
-    async function typeText(element, text, speed) {
+    async function typeText(element, text, speed, scroller) {
         for (const char of text) {
             element.textContent += char;
-            terminalContent.scrollTop = terminalContent.scrollHeight;
+            if (scroller) {
+                scroller.scrollTop = scroller.scrollHeight;
+            }
             await wait(speed);
         }
     }
 
-    async function renderSequence() {
-        if (!terminalContent) {
-            return;
-        }
+    function appendLine(text, type) {
+        const row = document.createElement('div');
+        row.className = `terminal-line ${type}`;
+        row.textContent = text;
+        terminalContent.appendChild(row);
+        terminalContent.scrollTop = terminalContent.scrollHeight;
+        return row;
+    }
 
+    function appendMessage(role) {
+        const row = document.createElement('div');
+        row.className = `chat-msg ${role}`;
+        chatContent.appendChild(row);
+        chatContent.scrollTop = chatContent.scrollHeight;
+        return row;
+    }
+
+    async function runTerminal() {
+        terminalContent.hidden = false;
+        chatContent.hidden = true;
         terminalContent.textContent = '';
+        heroTitle.textContent = 'terminal';
+        heroMeta.textContent = 'sop2harness CLI';
 
-        for (const line of sequence) {
-            const row = document.createElement('div');
-            row.className = `terminal-line ${line.type}`;
-            terminalContent.appendChild(row);
-
+        for (const line of cliLines) {
+            const row = appendLine('', line.type);
             if (line.type === 'command') {
-                await typeText(row, line.text, 13);
+                await typeText(row, line.text, 16, terminalContent);
             } else {
                 row.textContent = line.text;
             }
-
             terminalContent.scrollTop = terminalContent.scrollHeight;
             await wait(line.delay);
         }
-
-        await wait(1600);
-        renderSequence();
+        await wait(1000);
     }
 
-    void renderSequence();
+    async function runChat() {
+        terminalContent.hidden = true;
+        chatContent.hidden = false;
+        chatContent.textContent = '';
+        heroTitle.textContent = 'web chat';
+        heroMeta.textContent = 'who-anc · v0.1.0';
+
+        for (const message of chatScript) {
+            const row = appendMessage(message.role);
+            if (message.type) {
+                row.classList.add('typing');
+                await typeText(row, message.text, 13, chatContent);
+                row.classList.remove('typing');
+            } else {
+                row.textContent = message.text;
+            }
+            chatContent.scrollTop = chatContent.scrollHeight;
+            await wait(message.delay);
+        }
+    }
+
+    async function runHeroAnimation() {
+        if (!terminalContent || !chatContent) {
+            return;
+        }
+        for (;;) {
+            await runTerminal();
+            await runChat();
+        }
+    }
+
+    void runHeroAnimation();
 
     // ---- click-to-enlarge lightbox ----
     const lightbox = document.getElementById('lightbox');

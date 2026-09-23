@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="DeepClause turns SOPs and specifications into executable logic programs. Deterministic rule-based orchestration, typed LLM steps, per-phase tool scoping, static taint analysis, local models, and a portable WASM/AgentVM sandbox. Start with the pi extension, the TypeScript SDK, or the CLI.">
+    <meta name="description" content="DeepClause turns SOPs and specifications into executable logic programs. Deterministic rule-based orchestration, typed LLM steps, per-phase tool scoping, static taint analysis, local models, and a portable WASM/AgentVM sandbox. Start with sop2harness, the CLI that turns SOPs into a versioned harness, or the pi extension.">
     <title>DeepClause — executable SOPs and specs for reliable, auditable agents</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
     <noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
 </head>
 <body>
@@ -17,10 +18,10 @@
             </a>
             <nav class="site-nav">
                 <a href="#what">What it is</a>
-                <a href="#sdd">SDD</a>
-                <a href="#sop2agent">SOP2Agent</a>
+                <a href="#how">How it works</a>
+                <a href="#sop2harness">sop2harness</a>
                 <a href="#local">Local &amp; secure</a>
-                <a href="#get-started">Get started</a>
+                <a href="docs/sop2harness.html">Get started</a>
                 <a href="docs/index.html">Docs</a>
                 <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
             </nav>
@@ -32,7 +33,7 @@
             <div class="container">
                 <div class="hero-grid">
                     <div class="hero-copy reveal">
-                        <p class="eyebrow">Good old-fashioned AI for agents</p>
+                        <p class="eyebrow">Neurosymbolic AI for accountable agents</p>
                         <h1>Build domain-specific harnesses for regulated verticals.</h1>
                         <p class="hero-sub">Turn SOPs and specs into agents you can audit.</p>
                         <p class="lead">
@@ -41,36 +42,42 @@
                             the rest.
                         </p>
                         <div class="hero-actions">
-                            <a class="button button-primary" href="#get-started">Get started with pi</a>
-                            <a class="button button-secondary" href="#get-started">SDK &amp; CLI</a>
+                            <a class="button button-primary" href="docs/sop2harness.html">Get started with sop2harness</a>
+                            <a class="button button-secondary" href="https://github.com/deepclause/sop2harness" target="_blank" rel="noreferrer">SDK &amp; CLI</a>
                             <a class="button button-secondary" href="docs/index.html">Docs</a>
                         </div>
                     </div>
                     <div class="terminal-card reveal">
-                        <div class="terminal-window" aria-label="Install and run commands animation">
+                        <div class="terminal-window" aria-label="sop2harness CLI workflow and exported chat demo">
                             <div class="terminal-header">
-                                <span>terminal</span>
-                                <span>pi + CLI</span>
+                                <span id="hero-title">terminal</span>
+                                <span id="hero-meta">sop2harness CLI</span>
                             </div>
                             <div class="terminal-body" id="terminal-content"></div>
+                            <div class="chat-body" id="chat-content" hidden></div>
                         </div>
                     </div>
                 </div>
                 <div class="pipeline reveal" aria-label="DeepClause pipeline">
-                    <span>SOP / spec</span>
+                    <span>SOP</span>
                     <span class="pipeline-arrow">&rarr;</span>
-                    <span>executable DML</span>
+                    <span>s2h create</span>
                     <span class="pipeline-arrow">&rarr;</span>
-                    <span>review + diagram</span>
+                    <span>harness</span>
                     <span class="pipeline-arrow">&rarr;</span>
-                    <span>run</span>
+                    <span>export</span>
                     <span class="pipeline-arrow">&rarr;</span>
-                    <span>trace</span>
+                    <span>chat / MCP</span>
                 </div>
             </div>
         </section>
 
-        <section id="what" class="section section-alt">
+
+
+
+
+
+        <section id="what" class="section">
             <div class="container">
                 <div class="section-heading reveal">
                     <p class="eyebrow">What it is</p>
@@ -82,79 +89,94 @@
                         <p>Specs become programs with guaranteed control flow, typed outputs, and constraints — not prose an agent may ignore.</p>
                     </article>
                     <article class="info-card reveal">
-                        <h3>SOP2Agent</h3>
-                        <p>One auditable policy per workflow: deterministic rules, scoped LLM steps, verified post-conditions.</p>
+                        <h3>sop2harness</h3>
+                        <p>One CLI from SOP to a versioned harness: procedures and policies as executable Skills.</p>
                     </article>
                     <article class="info-card reveal">
                         <h3>Local &amp; secure</h3>
-                        <p>Runs on local models, inside a WebAssembly logic core and a portable sandbox.</p>
+                        <p>Runs well on local models: deterministic control flow, scoped LLM steps, and a portable sandbox.</p>
                     </article>
                 </div>
             </div>
         </section>
 
-        <section id="sdd" class="section">
+        <section id="how" class="section section-alt">
             <div class="container">
                 <div class="section-heading reveal">
-                    <p class="eyebrow">Spec-driven development</p>
-                    <h2>Loops and graphs are easy. Guarantees are the hard part.</h2>
+                    <p class="eyebrow">How it works</p>
+                    <h2>From SOPs to a harness, to any MCP client.</h2>
                     <p>
-                        Most specs are still prose in a context window, where a requirement can be
-                        ignored and a fallback can be hallucinated. DeepClause lowers them to a
-                        compact logic language with real control flow.
-                    </p>
-                    <ul class="clean-list">
-                        <li><strong>Guaranteed control flow.</strong> A failed step backtracks to the next clause.</li>
-                        <li><strong>Typed model output.</strong> Integers, lists, and objects are validated and retried.</li>
-                        <li><strong>Reviewable artifact.</strong> The <code>.dml</code> is the plan — diff it, test it, ship it.</li>
-                    </ul>
-                    <p class="link-row">
-                        <a href="https://deepclause.substack.com/p/loops-graphs-prolog" target="_blank" rel="noreferrer">Read: loops and graphs &rarr;</a>
-                        <a href="docs/dml-language-reference.html">DML reference &rarr;</a>
+                        <code>sop2harness</code> compiles your SOPs into a harness &mdash;
+                        procedures and policies as executable Skills. Drive those Skills directly
+                        from a chat UI, or export them over MCP to Claude and other agents.
                     </p>
                 </div>
-                <figure class="screenshot-frame diagram-wide reveal">
-                    <div class="diagram-tall">
-                        <img class="zoomable" data-full="images/sdd-deep-research.png" src="images/sdd-deep-research.png" alt="Deep research DML workflow graph with six phases, Bing search tool calls, and a user approval step." loading="lazy" width="1500" height="4243">
+                <!-- Source mirror: diagrams/sop2harness-workflow.mmd -->
+                <div class="mermaid-wrap reveal">
+                    <pre class="mermaid">
+flowchart LR
+    SOPs[("📄 SOPs<br/>Policies · procedures<br/>and specs")]
+    S2H{{"⚙️ sop2harness<br/>Compile into a harness"}}
+    Harness["🧩 Harness<br/><b>Procedures and policies<br/>as executable Skills</b>"]
+    Chat["💬 Chat UI<br/>Direct link to the Harness"]
+    Export["🔌 Executable Skills<br/>Exported via MCP"]
+    Clients(["🤝 MCP ↔ Claude / others"])
+
+    SOPs --> S2H --> Harness
+    Harness -->|direct| Chat
+    Harness -->|export| Export
+    Export --> Clients
+
+    classDef source fill:#ffffff,stroke:#cac2b4,stroke-width:1.5px,color:#16181d;
+    classDef build fill:#eef6f7,stroke:#0a7a8c,stroke-width:1.5px,color:#075463;
+    classDef core fill:#0a7a8c,stroke:#075463,stroke-width:2px,color:#ffffff;
+    classDef deliver fill:#ffffff,stroke:#0a7a8c,stroke-width:1.5px,color:#075463;
+    classDef external fill:#111628,stroke:#111628,color:#e6f0ff;
+
+    class SOPs source;
+    class S2H build;
+    class Harness core;
+    class Chat,Export deliver;
+    class Clients external;
+                    </pre>
+                </div>
+            </div>
+        </section>
+
+        <section id="sop2harness" class="section">
+            <div class="container">
+                <div class="section-heading reveal">
+                    <p class="eyebrow">sop2harness</p>
+                    <h2>Turn a 100-page SOP into a harness that follows it — verifiably.</h2>
+                    <p>
+                        <code>s2h</code> compiles an SOP into one auditable harness of executable
+                        Skills, versions it, and exports it as a self-hosted API, web chat, and MCP
+                        server. Authoring happens in a pi session; the runtime is deterministic DML.
+                    </p>
+                </div>
+                <div class="stage-row reveal" aria-label="How a harness runs">
+                    <div class="stage">
+                        <p class="stage-kicker">Deterministic spine</p>
+                        <h3>Rules run in code</h3>
+                        <p>Amounts, thresholds, and deadlines are computed in DML &mdash; never judged by the model.</p>
                     </div>
-                    <figcaption>
-                        A deep-research workflow as a DML graph: phases, typed outputs, a human
-                        approval step, and per-phase tool scopes.
-                        <a class="link-inline" href="images/sdd-deep-research.png" target="_blank" rel="noreferrer">Open full size</a>
-                    </figcaption>
-                </figure>
-            </div>
-        </section>
-
-        <section id="sop2agent" class="section section-alt">
-            <div class="container">
-                <div class="section-heading reveal">
-                    <p class="eyebrow">SOP2Agent</p>
-                    <h2>Turn a 100-page SOP into agents that follow it — verifiably.</h2>
-                    <p>
-                        Long SOPs are where agents fail, and where compliance matters most.
-                        DeepClause turns an SOP into one auditable policy per workflow.
-                    </p>
+                    <div class="stage-arrow" aria-hidden="true">&rarr;</div>
+                    <div class="stage">
+                        <p class="stage-kicker">Agentic leaves</p>
+                        <h3>Models do scoped steps</h3>
+                        <p>Reading and drafting run as LLM steps with only the tools that phase allows.</p>
+                    </div>
+                    <div class="stage-arrow" aria-hidden="true">&rarr;</div>
+                    <div class="stage">
+                        <p class="stage-kicker">Verified &amp; explainable</p>
+                        <h3>Results are checked and traceable</h3>
+                        <p>A run records every rule, tool call, and model step, so the result can be re-checked and explained &mdash; not just taken on trust.</p>
+                    </div>
                 </div>
-                <div class="card-grid three-up">
-                    <article class="info-card reveal">
-                        <h3>Deterministic spine</h3>
-                        <p>Amounts, thresholds, and deadlines are computed as rules — never judged by the model.</p>
-                    </article>
-                    <article class="info-card reveal">
-                        <h3>Agentic leaves</h3>
-                        <p>Reading and drafting run as scoped LLM loops with only the allowed tools.</p>
-                    </article>
-                    <article class="info-card reveal">
-                        <h3>Verified outcome</h3>
-                        <p>The program re-reads the result and reports <code>PASS</code>/<code>FAIL</code> against post-conditions.</p>
-                    </article>
-                </div>
-                <div class="callout-strip reveal">
-                    <span>Rules live in code, not in the model's judgement.</span>
-                    <span>Drafts only — no way to send email.</span>
-                    <span>No tool to approve your own invoice.</span>
-                </div>
+                <p class="guarantee-line reveal">
+                    Nothing is accepted because the model said so: the policy is a program you can
+                    read, and every run leaves a trace you can audit.
+                </p>
                 <div class="diagram-pair reveal">
                     <figure class="screenshot-frame">
                         <div class="diagram-tall">
@@ -181,7 +203,7 @@
             </div>
         </section>
 
-        <section id="regulated" class="section">
+        <section id="regulated" class="section section-alt">
             <div class="container">
                 <div class="section-heading reveal">
                     <p class="eyebrow">Built for regulated work</p>
@@ -228,79 +250,41 @@
             </div>
         </section>
 
-        <section id="local" class="section section-alt">
+        <section id="local" class="section">
             <div class="container">
                 <div class="section-heading reveal">
-                    <p class="eyebrow">Local-first and secure</p>
-                    <h2>Your models. Your data. A sandbox you can prove.</h2>
-                    <p>Built to raise small and local models, not to assume a frontier API.</p>
+                    <p class="eyebrow">Local &amp; secure</p>
+                    <h2>Runs well on local models &mdash; better than instructions alone.</h2>
+                    <p>Deterministic DML carries the control flow, so a small local model only has to handle the scoped steps.</p>
                 </div>
-                <div class="card-grid three-up">
+                <div class="card-grid two-up">
                     <article class="info-card reveal">
-                        <h3>Bring your own endpoint</h3>
-                        <p>Point DeepClause at Ollama, vLLM, LM Studio, or any OpenAI-compatible server.</p>
+                        <h3>Secure</h3>
+                        <p>Secure code execution thanks to a sandboxed WebAssembly logic core.</p>
+                        <ul class="clean-list">
+                            <li>Deterministic DML runs in a WASM logic core, reachable only through explicit host hooks.</li>
+                            <li>Shell tools run in a portable AgentVM sandbox, with network off by default.</li>
+                            <li>Static taint analysis flags untrusted data reaching prompts, tools, or memory.</li>
+                        </ul>
                     </article>
                     <article class="info-card reveal">
-                        <h3>Isolation</h3>
-                        <p>A WebAssembly logic core, an AgentVM shell sandbox, and bwrap/seatbelt host isolation.</p>
+                        <h3>Private</h3>
+                        <p>
+                            Because DML gives each run a deterministic control flow, the model only
+                            has to handle scoped steps &mdash; so smaller local models go further.
+                            Point DeepClause at Ollama, vLLM, LM Studio, or any OpenAI-compatible
+                            server, and your data stays on the machine.
+                        </p>
+                        <p class="lift-note">
+                            <strong>Measured lift.</strong> On DeepPlanning travel planning, DeepClause
+                            raised a <strong>35B local model from 22.2% to 42.9% composite</strong> and
+                            from <strong>82.5% to 98.3% task delivery</strong>.
+                        </p>
                     </article>
-                    <article class="info-card reveal">
-                        <h3>Compile-time security</h3>
-                        <p>Static taint analysis flags untrusted data reaching prompts, tools, or memory.</p>
-                    </article>
-                </div>
-                <div class="info-panel gap-top reveal">
-                    <h3>Measured small-model lift</h3>
-                    <p>
-                        On DeepPlanning travel planning, DeepClause lifted a <strong>35B local
-                        model from 22.2% to 42.9% composite</strong> and from <strong>82.5% to
-                        98.3% task delivery</strong>.
-                    </p>
                 </div>
             </div>
         </section>
 
-        <section id="get-started" class="section">
-            <div class="container">
-                <div class="section-heading reveal">
-                    <p class="eyebrow">Get started</p>
-                    <h2>Start in pi. Embed anywhere.</h2>
-                    <p>Author and run policies in your coding session, or embed DeepClause in your own service.</p>
-                </div>
-                <div class="card-grid three-up">
-                    <article class="info-card reveal accent-card">
-                        <h3>pi extension <span class="tag">recommended</span></h3>
-                        <pre class="snippet"><code>pi install \
-  git:github.com/deepclause/deepclause-pi</code></pre>
-                        <p>Ask pi to turn your SOP into DML, then run it with <code>/dc-run</code>. Uses pi's model and credentials.</p>
-                        <p><a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension on GitHub &rarr;</a></p>
-                    </article>
-                    <article class="info-card reveal">
-                        <h3>TypeScript SDK</h3>
-                        <pre class="snippet"><code>import { createDeepClause } from "deepclause-sdk";
-
-const dc = await createDeepClause({
-  model: "host-active-model",
-  llmBackend, // your model
-});</code></pre>
-                        <p>Bring your own model backend; no provider keys required when the host supplies the LLM.</p>
-                        <p><a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">SDK on GitHub &rarr;</a></p>
-                    </article>
-                    <article class="info-card reveal">
-                        <h3>CLI</h3>
-                        <pre class="snippet"><code>npm install -g deepclause-sdk
-deepclause compile spec.md --analyze
-deepclause run skill.dml --sandbox</code></pre>
-                        <p>Headless execution for CI and scripts, with static analysis built in.</p>
-                        <p><a href="docs/index.html#cli-sdk">CLI and SDK docs &rarr;</a></p>
-                    </article>
-                </div>
-                <div class="mini-note reveal">
-                    <strong>Other agents and hosts:</strong> use the SDK's injectable model backend,
-                    the CLI, or MCP tools. The runtime tool whitelist stays explicit.
-                </div>
-            </div>
-        </section>
     </main>
 
     <footer class="site-footer">
@@ -311,9 +295,9 @@ deepclause run skill.dml --sandbox</code></pre>
             </div>
             <div class="footer-links">
                 <a href="docs/index.html">Docs</a>
+                <a href="https://github.com/deepclause/sop2harness" target="_blank" rel="noreferrer">sop2harness</a>
                 <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
-                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">SDK</a>
-                <a href="blog/index.html">Blog</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">DML SDK</a>
                 <a href="https://github.com/deepclause" target="_blank" rel="noreferrer">GitHub</a>
                 <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
             </div>

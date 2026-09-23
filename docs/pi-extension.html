@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="The DeepClause pi extension: author and run DML inside a pi session with the SDD (SpecKit) workflow and the Handbook to DML skill, using pi's model, credentials, session, and cancellation.">
+    <title>pi extension — DeepClause docs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../logo.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Docs</a>
+                <a href="sop2harness.html">sop2harness</a>
+                <a href="pi-extension.html">pi extension</a>
+                <a href="dml-language-reference.html">DML reference</a>
+                <a href="sdk.html">DML SDK/CLI</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <div class="container docs-shell">
+            <aside class="docs-sidebar">
+                <nav>
+                    <p class="sidebar-label">Guides</p>
+                    <a href="index.html">Documentation</a>
+                    <a href="sop2harness.html">sop2harness</a>
+                    <a href="pi-extension.html" class="active">pi extension</a>
+                    <a href="speckit.html" class="tree-1">SDD &middot; SpecKit</a>
+                    <a href="handbook.html" class="tree-1">Handbook &rarr; DML</a>
+                    <a href="dml-sdk-guide.html">DML SDK &amp; CLI</a>
+                    <p class="sidebar-label">Reference</p>
+                    <a href="dml-language-reference.html">DML language reference</a>
+                    <a href="dml-language-examples.html">DML language examples</a>
+                    <a href="sdk.html">DML SDK/CLI</a>
+                    <a href="sdk-api-reference.html" class="tree-1">API reference</a>
+                    <a href="sop2harness-cli.html">Sop2Harness CLI</a>
+                    <p class="sidebar-label">On this page</p>
+                    <a href="#what">What it is</a>
+                    <a href="#workflows">Two workflows</a>
+                    <a href="#commands">Commands</a>
+                    <a href="#runtime">Runtime and model</a>
+                    <a href="#install">Install</a>
+                    <a href="#links">Links</a>
+                </nav>
+            </aside>
+
+            <div class="docs-content">
+                <header class="docs-intro reveal">
+                    <p class="eyebrow">Guide &middot; pi extension</p>
+                    <h1>The pi extension</h1>
+                    <p class="docs-lead">
+                        Author and run DeepClause DML inside a pi session. The extension supplies the
+                        authoring guide, the <code>/dc-*</code> commands, session context, and an
+                        optional model-callable <code>dc_run</code> tool &mdash; while pi supplies
+                        the model, credentials, UI, and cancellation.
+                    </p>
+                    <div class="doc-actions">
+                        <a class="button button-primary" href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension on GitHub</a>
+                        <a class="button button-secondary" href="speckit.html">SDD &middot; SpecKit</a>
+                        <a class="button button-secondary" href="handbook.html">Handbook &rarr; DML</a>
+                    </div>
+                </header>
+
+                <section id="what" class="docs-section reveal">
+                    <h2>What it is</h2>
+                    <p>
+                        The DeepClause pi extension turns a normal coding session into a DML
+                        authoring and execution environment. Programs live under
+                        <code>.pi/deepclause/skills/</code>; pi creates and edits them with its
+                        normal coding abilities, and users run them through slash commands.
+                    </p>
+                    <ul>
+                        <li><strong>No compiler.</strong> Generated content must already be valid DML.</li>
+                        <li><strong>pi owns the session.</strong> No separate DeepClause sessions; forks and compaction are respected.</li>
+                        <li><strong>User-triggered execution.</strong> Runs happen through <code>/dc-run</code>, or through <code>dc_run</code> only after explicit enablement.</li>
+                    </ul>
+                </section>
+
+                <section id="workflows" class="docs-section reveal">
+                    <h2>Two workflows</h2>
+                    <p>The extension ships two authoring skills, both producing DML for the same runtime.</p>
+                    <div class="pillar-grid">
+                        <article class="pillar">
+                            <span class="pillar-kicker">SDD &middot; SpecKit</span>
+                            <h3>Spec-driven changes</h3>
+                            <p>
+                                Markdown specs are the source of truth; a change is a reviewed
+                                proposal with delta specs and an executable task plan.
+                            </p>
+                            <a class="pillar-link" href="speckit.html">Read the SpecKit guide &rarr;</a>
+                        </article>
+                        <article class="pillar">
+                            <span class="pillar-kicker">Handbook &rarr; DML</span>
+                            <h3>Turn SOPs into DML policies</h3>
+                            <p>
+                                A long handbook becomes one auditable DML policy per workflow:
+                                deterministic rules, scoped LLM steps, and verified post-conditions.
+                            </p>
+                            <a class="pillar-link" href="handbook.html">Read the handbook guide &rarr;</a>
+                        </article>
+                    </div>
+                </section>
+
+                <section id="commands" class="docs-section reveal">
+                    <h2>Commands</h2>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Command</th><th>Effect</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>/dc</code></td><td>Show help, active model, paths, and runtime status</td></tr>
+                                <tr><td><code>/dc-list</code></td><td>List DML files under <code>skills/</code> and <code>plans/</code></td></tr>
+                                <tr><td><code>/dc-plan &lt;request&gt;</code></td><td>Create a validated executable DML plan through a normal pi planning turn</td></tr>
+                                <tr><td><code>/dc-run &lt;skill|path&gt;</code></td><td>Execute a named skill or a DML file inside <code>.pi/deepclause/</code></td></tr>
+                                <tr><td><code>/dc-tool enable|disable|status</code></td><td>Control the optional model-callable <code>dc_run</code> tool</td></tr>
+                                <tr><td><code>/dc-cancel</code></td><td>Cancel the current execution</td></tr>
+                                <tr><td><code>/dc-check &lt;skill&gt;</code></td><td>Parse and statically validate DML without executing it</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="runtime" class="docs-section reveal">
+                    <h2>Runtime and model</h2>
+                    <p>
+                        Every DML LLM operation uses pi's active model, existing credentials,
+                        cancellation signal, streaming facilities, and usage accounting. The
+                        extension never requests API keys, infers providers, or mutates provider
+                        environment variables.
+                    </p>
+                    <ul>
+                        <li><strong>Context modes.</strong> <code>turn</code> (default), <code>branch</code>, and <code>isolated</code>.</li>
+                        <li><strong>Scoped tools.</strong> Runtime tools are registered explicitly; pi's full tool registry is never handed to DML.</li>
+                        <li><strong>Path isolation.</strong> DML paths cannot escape the active workspace.</li>
+                        <li><strong>Opt-in <code>dc_run</code>.</strong> The model-callable tool is disabled by default and can only execute existing DML under <code>.pi/deepclause/</code>.</li>
+                    </ul>
+                </section>
+
+                <section id="install" class="docs-section reveal">
+                    <h2>Install</h2>
+                    <pre><code>pi install git:github.com/deepclause/deepclause-pi</code></pre>
+                    <p>
+                        Then run <code>/dc</code> in a workspace to initialize
+                        <code>.pi/deepclause/</code>. Existing files are preserved; bundled docs are
+                        only upgraded through explicit, non-destructive versioning.
+                    </p>
+                    <p class="link-row">
+                        <a href="sop2harness.html">Use sop2harness instead &rarr;</a>
+                        <a href="dml-language-reference.html">DML reference &rarr;</a>
+                    </p>
+                </section>
+
+                <section id="links" class="docs-section reveal">
+                    <h2>Links</h2>
+                    <p class="link-row">
+                        <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension repository &rarr;</a>
+                        <a href="https://github.com/deepclause/deepclause-pi/blob/main/skills/handbook-dml/SKILL.md" target="_blank" rel="noreferrer">Handbook &rarr; DML skill &rarr;</a>
+                        <a href="speckit.html">SpecKit guide &rarr;</a>
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Executable SOPs and specs for reliable, auditable agents.</p>
+            </div>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="https://github.com/deepclause/sop2harness" target="_blank" rel="noreferrer">sop2harness</a>
+                <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">DML SDK</a>
+                <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

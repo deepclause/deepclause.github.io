@@ -1,0 +1,24 @@
+flowchart LR
+    SOPs[("📄 SOPs<br/>Policies · procedures<br/>and specs")]
+    S2H{{"⚙️ sop2harness<br/>Compile into a harness"}}
+    Harness["🧩 Harness<br/><b>Procedures and policies<br/>as executable Skills</b>"]
+    Chat["💬 Chat UI<br/>Direct link to the Harness"]
+    Export["🔌 Executable Skills<br/>Exported via MCP"]
+    Clients(["🤝 MCP ↔ Claude / others"])
+
+    SOPs --> S2H --> Harness
+    Harness -->|direct| Chat
+    Harness -->|export| Export
+    Export --> Clients
+
+    classDef source fill:#ffffff,stroke:#cac2b4,stroke-width:1.5px,color:#16181d;
+    classDef build fill:#eef6f7,stroke:#0a7a8c,stroke-width:1.5px,color:#075463;
+    classDef core fill:#0a7a8c,stroke:#075463,stroke-width:2px,color:#ffffff;
+    classDef deliver fill:#ffffff,stroke:#0a7a8c,stroke-width:1.5px,color:#075463;
+    classDef external fill:#111628,stroke:#111628,color:#e6f0ff;
+
+    class SOPs source;
+    class S2H build;
+    class Harness core;
+    class Chat,Export deliver;
+    class Clients external;

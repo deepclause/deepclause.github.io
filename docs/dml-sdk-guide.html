@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Standalone DML SDK and CLI guide: install, initialize, run DML headless, and embed the runtime in TypeScript without pi or sop2harness. Models, tools, sandboxing, and CI.">
+    <title>DML SDK &amp; CLI — guide — DeepClause docs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../logo.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Docs</a>
+                <a href="sop2harness.html">sop2harness</a>
+                <a href="pi-extension.html">pi extension</a>
+                <a href="dml-language-reference.html">DML reference</a>
+                <a href="sdk.html">DML SDK/CLI</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <div class="container docs-shell">
+            <aside class="docs-sidebar">
+                <nav>
+                    <p class="sidebar-label">Guides</p>
+                    <a href="index.html">Documentation</a>
+                    <a href="sop2harness.html">sop2harness</a>
+                    <a href="pi-extension.html">pi extension</a>
+                    <a href="speckit.html" class="tree-1">SDD &middot; SpecKit</a>
+                    <a href="handbook.html" class="tree-1">Handbook &rarr; DML</a>
+                    <a href="dml-sdk-guide.html" class="active">DML SDK &amp; CLI</a>
+                    <p class="sidebar-label">Reference</p>
+                    <a href="dml-language-reference.html">DML language reference</a>
+                    <a href="dml-language-examples.html">DML language examples</a>
+                    <a href="sdk.html">DML SDK/CLI</a>
+                    <a href="sdk-api-reference.html" class="tree-1">API reference</a>
+                    <a href="sop2harness-cli.html">Sop2Harness CLI</a>
+                    <p class="sidebar-label">On this page</p>
+                    <a href="#who">Who this is for</a>
+                    <a href="#install">Install</a>
+                    <a href="#run">Run DML headless</a>
+                    <a href="#embed">Embed in TypeScript</a>
+                    <a href="#tools">Tools and the whitelist</a>
+                    <a href="#models">Models and providers</a>
+                    <a href="#sandbox">Sandboxing</a>
+                    <a href="#ci">Use it in CI</a>
+                    <a href="#next">Next steps</a>
+                </nav>
+            </aside>
+
+            <div class="docs-content">
+                <header class="docs-intro reveal">
+                    <p class="eyebrow">Guide &middot; DML SDK &amp; CLI</p>
+                    <h1>Use the DML SDK and CLI standalone</h1>
+                    <p class="docs-lead">
+                        Everything here works without pi and without sop2harness. If you already have
+                        DML programs &mdash; or you want to run and embed DeepClause in your own
+                        service &mdash; the <code>deepclause-sdk</code> CLI and the TypeScript SDK are
+                        the whole surface.
+                    </p>
+                    <div class="doc-actions">
+                        <a class="button button-primary" href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">DML SDK on GitHub</a>
+                        <a class="button button-secondary" href="sdk.html">Command reference</a>
+                        <a class="button button-secondary" href="sdk-api-reference.html">API reference</a>
+                    </div>
+                </header>
+
+                <section id="who" class="docs-section reveal">
+                    <h2>Who this is for</h2>
+                    <p>
+                        Use this guide if you do <strong>not</strong> author with the
+                        <a href="pi-extension.html">pi extension</a> and do <strong>not</strong> build
+                        harnesses with <a href="sop2harness.html">sop2harness</a>. You just have DML
+                        files and want to run them headless or call the runtime from TypeScript.
+                    </p>
+                    <div class="callout">
+                        <strong>Two ways in</strong>
+                        <ul>
+                            <li><strong>CLI</strong> &mdash; run a <code>.dml</code> program from a shell, a script, or CI.</li>
+                            <li><strong>TypeScript SDK</strong> &mdash; embed the runtime in a service and supply your own model backend.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="install" class="docs-section reveal">
+                    <h2>Install</h2>
+                    <p>DeepClause requires Node.js 18+.</p>
+                    <pre><code>npm install -g deepclause-sdk
+deepclause init
+deepclause show-model</code></pre>
+                    <p>
+                        <code>deepclause init</code> creates <code>.deepclause/config.json</code>,
+                        the local tools directory, and the seeded system assets. Every command except
+                        <code>init</code> expects a <code>.deepclause/</code> directory in the
+                        workspace. Use <code>npx deepclause-sdk@latest</code> for a one-off run.
+                    </p>
+                </section>
+
+                <section id="run" class="docs-section reveal">
+                    <h2>Run DML headless</h2>
+                    <p>Point the CLI at a DML file and pass the input as an argument.</p>
+                    <pre><code>deepclause run skills/anc-routine-care.dml \
+    "What antenatal checkups are due at 28 weeks?" \
+    --stream \
+    --workspace ./data \
+    --sandbox \
+    --trace run.json</code></pre>
+                    <ul>
+                        <li><code>--stream</code> prints model text as it arrives.</li>
+                        <li><code>--workspace</code> sets the directory file tools may read or write.</li>
+                        <li><code>--sandbox</code> runs shell tools inside the AgentVM container VM.</li>
+                        <li><code>--trace</code> writes a run record for review.</li>
+                    </ul>
+                    <p>To produce a DML file from a Markdown spec, use <code>compile</code> or <code>plan</code>:</p>
+                    <pre><code>deepclause compile spec.md --analyze
+deepclause plan spec.md --out skills/my-skill.dml</code></pre>
+                    <p class="footnote">
+                        Compilation and static analysis live in the general SDK. The pi extension does
+                        not use them; there, pi authors DML directly.
+                    </p>
+                </section>
+
+                <section id="embed" class="docs-section reveal">
+                    <h2>Embed in TypeScript</h2>
+                    <p>
+                        Supply a host-provided model backend with <code>createDeepClause</code>; no
+                        provider credentials are required when the host supplies the LLM.
+                    </p>
+                    <pre><code>import { createDeepClause, type LLMBackend } from "deepclause-sdk";
+
+const llmBackend: LLMBackend = {
+  async complete(request) {
+    const response = await hostModel.complete({
+      messages: request.messages,
+      tools: request.tools,
+      signal: request.signal,
+    });
+    return {
+      text: response.text,
+      toolCalls: response.toolCalls,
+      usage: response.usage,
+    };
+  },
+};
+
+const deepclause = await createDeepClause({
+  model: "host-active-model",
+  llmBackend,
+});
+
+const result = await deepclause.runDML(dmlSource, {
+  args: ["What antenatal checkups are due at 28 weeks?"],
+  onText: (delta) => process.stdout.write(delta),
+});</code></pre>
+                    <p>
+                        The backend receives messages, DML task tools, cancellation, token limits, and
+                        an optional <code>onText</code> callback. See the
+                        <a href="sdk-api-reference.html">API reference</a> for the full option and
+                        event surface.
+                    </p>
+                </section>
+
+                <section id="tools" class="docs-section reveal">
+                    <h2>Tools and the whitelist</h2>
+                    <p>
+                        DML-defined tool predicates stay under a runtime tool whitelist. Only tools
+                        you register are reachable, so an embedding exposes high-level DML tools
+                        without handing over the full runtime registry.
+                    </p>
+                    <pre><code>const deepclause = await createDeepClause({
+  model: "host-active-model",
+  llmBackend,
+  tools: {
+    read_file: { policy: "allow", handler: readFile },
+    list_files: { policy: "allow", handler: listFiles },
+    write_file: { policy: "approval", handler: writeFile },
+  },
+});</code></pre>
+                    <p>
+                        Use <code>deepclause list-tools</code> to see the resolved built-in and MCP
+                        tools.
+                    </p>
+                </section>
+
+                <section id="models" class="docs-section reveal">
+                    <h2>Models and providers</h2>
+                    <p>
+                        Model choice is split into three slots: <code>gateway</code> (orchestration),
+                        <code>run</code> (skill execution), and <code>compile</code> (authoring).
+                    </p>
+                    <pre><code>deepclause set-model anthropic:claude-sonnet-4-20250514 --slot compile
+deepclause set-model openrouter:google/gemini-2.5-flash --slot gateway</code></pre>
+                    <p>For local or self-hosted models, use an OpenAI-compatible <code>custom:</code> provider:</p>
+                    <pre><code>export LLM_PROVIDER_LOCAL_BASE_URL="http://localhost:11434/v1"
+export LLM_PROVIDER_LOCAL_API_KEY="dummy"
+deepclause set-model custom:local:qwen3-32b --slot run</code></pre>
+                    <p class="footnote">
+                        Works with Ollama, vLLM, LM Studio, or any endpoint that speaks an
+                        OpenAI-style chat/completions API.
+                    </p>
+                </section>
+
+                <section id="sandbox" class="docs-section reveal">
+                    <h2>Sandboxing and static analysis</h2>
+                    <ul>
+                        <li><strong>WASM logic core.</strong> DML executes in a logic engine compiled to WebAssembly; the host is reachable only through explicit hooks.</li>
+                        <li><strong>Host shell by default.</strong> Shell tools run in the active workspace; <code>shell.wrapper</code> can force <code>clean-room</code>, <code>bwrap</code>, or <code>sandbox-exec</code>.</li>
+                        <li><strong>AgentVM on demand.</strong> <code>--sandbox</code> runs shell tools inside a dependency-free container VM, with network off by default.</li>
+                        <li><strong>Compile-time security.</strong> Static taint analysis flags untrusted data reaching the system prompt, dangerous tools, or task memory; an optional LLM audit reviews the program. Use <code>--no-audit</code> to skip only the LLM review.</li>
+                    </ul>
+                </section>
+
+                <section id="ci" class="docs-section reveal">
+                    <h2>Use it in CI</h2>
+                    <p>A minimal headless job: install, run with a trace, and fail the build on a non-zero exit.</p>
+                    <pre><code>npm install -g deepclause-sdk
+deepclause init --model openai:gpt-4o-mini
+deepclause run skills/anc-routine-care.dml "Checkup schedule at 28 weeks" \
+    --sandbox --trace artifacts/run.json --no-audit</code></pre>
+                    <p>
+                        Credentials come from the environment. DeepClause never asks for or stores an
+                        API key in the workspace.
+                    </p>
+                </section>
+
+                <section id="next" class="docs-section reveal">
+                    <h2>Next steps</h2>
+                    <p class="link-row">
+                        <a href="sdk.html">DML SDK/CLI command reference &rarr;</a>
+                        <a href="sdk-api-reference.html">API reference &rarr;</a>
+                        <a href="dml-language-reference.html">DML language reference &rarr;</a>
+                        <a href="dml-language-examples.html">DML language examples &rarr;</a>
+                    </p>
+                    <p class="footnote">
+                        Using pi or sop2harness instead? Start with the
+                        <a href="pi-extension.html">pi extension</a> or
+                        <a href="sop2harness.html">sop2harness</a> guides.
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Executable SOPs and specs for reliable, auditable agents.</p>
+            </div>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="https://github.com/deepclause/sop2harness" target="_blank" rel="noreferrer">sop2harness</a>
+                <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">DML SDK</a>
+                <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>

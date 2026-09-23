@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Sop2Harness CLI reference: init, create, commit, export, and helper commands for turning SOPs into versioned, exportable DML harnesses.">
+    <title>Sop2Harness CLI — DeepClause docs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../logo.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Docs</a>
+                <a href="sop2harness.html">sop2harness</a>
+                <a href="pi-extension.html">pi extension</a>
+                <a href="dml-language-reference.html">DML reference</a>
+                <a href="sdk.html">DML SDK/CLI</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <div class="container docs-shell">
+            <aside class="docs-sidebar">
+                <nav>
+                    <p class="sidebar-label">Guides</p>
+                    <a href="index.html">Documentation</a>
+                    <a href="sop2harness.html">sop2harness</a>
+                    <a href="pi-extension.html">pi extension</a>
+                    <a href="speckit.html" class="tree-1">SDD &middot; SpecKit</a>
+                    <a href="handbook.html" class="tree-1">Handbook &rarr; DML</a>
+                    <a href="dml-sdk-guide.html">DML SDK &amp; CLI</a>
+                    <p class="sidebar-label">Reference</p>
+                    <a href="dml-language-reference.html">DML language reference</a>
+                    <a href="dml-language-examples.html">DML language examples</a>
+                    <a href="sdk.html">DML SDK/CLI</a>
+                    <a href="sdk-api-reference.html" class="tree-1">API reference</a>
+                    <a href="sop2harness-cli.html" class="active">Sop2Harness CLI</a>
+                    <p class="sidebar-label">On this page</p>
+                    <a href="#commands">Commands</a>
+                    <a href="#init">init</a>
+                    <a href="#create">create</a>
+                    <a href="#commit">commit</a>
+                    <a href="#export">export</a>
+                    <a href="#helpers">Helpers</a>
+                    <a href="#config">Config and models</a>
+                </nav>
+            </aside>
+
+            <div class="docs-content">
+                <header class="docs-intro reveal">
+                    <p class="eyebrow">Reference &middot; Sop2Harness CLI</p>
+                    <h1>Sop2Harness CLI</h1>
+                    <p class="docs-lead">
+                        Command reference for <code>s2h</code>: scaffold a project, author a
+                        harness from SOPs through a pi session, version it, and export a runnable
+                        API, web chat, and MCP server.
+                    </p>
+                    <div class="doc-actions">
+                        <a class="button button-primary" href="https://github.com/deepclause/sop2harness" target="_blank" rel="noreferrer">sop2harness on GitHub</a>
+                        <a class="button button-secondary" href="sop2harness.html">Read the guide</a>
+                    </div>
+                </header>
+
+                <div class="callout reveal">
+                    <strong>Install</strong>
+                    <code>npm install -g deepclause-sop2harness</code> installs the
+                    <code>s2h</code> command. <code>init</code>, <code>create</code>,
+                    <code>test</code>, <code>check</code>, <code>commit</code>,
+                    <code>export</code>, <code>list</code>, and <code>status</code> are
+                    implemented; <code>run</code>, <code>config</code>, and
+                    <code>doctor</code> are planned helpers.
+                </div>
+
+                <section id="commands" class="docs-section reveal">
+                    <h2>Commands</h2>
+                    <pre><code>s2h &lt;command&gt; [options]</code></pre>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr><th>Command</th><th>Effect</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><code>s2h init</code></td><td>Scaffold an s2h project</td></tr>
+                                <tr><td><code>s2h create [request]</code></td><td>Author or update a harness from a prompt and/or SOP files</td></tr>
+                                <tr><td><code>s2h test</code></td><td>Validate, inspect diagrams, and smoke-run skills (mock by default, <code>--live</code> for a real model)</td></tr>
+                                <tr><td><code>s2h check</code></td><td>Validate the harness without changing it</td></tr>
+                                <tr><td><code>s2h commit</code></td><td>Version, commit, tag, and record history</td></tr>
+                                <tr><td><code>s2h export</code></td><td>Generate a runnable API, web chat, MCP server, and Dockerfile</td></tr>
+                                <tr><td><code>s2h list</code></td><td>List skills, SOPs, and versions</td></tr>
+                                <tr><td><code>s2h status</code></td><td>Show project, harness, and version state</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <section id="init" class="docs-section reveal">
+                    <h2>init</h2>
+                    <pre><code>s2h init [--name &lt;name&gt;] [--model &lt;provider/id&gt;] [--force]</code></pre>
+                    <p>Creates <code>s2h.json</code>, <code>.gitignore</code>, <code>.s2h/</code>, and <code>harness/</code>, seeds <code>.pi/deepclause/</code> non-destructively, writes <code>harness/harness.json</code>, and initializes git if needed. Existing files are never overwritten without <code>--force</code>.</p>
+                </section>
+
+                <section id="create" class="docs-section reveal">
+                    <h2>create</h2>
+                    <pre><code>s2h create [request] [--file &lt;path&gt;...] [--name &lt;slug&gt;] [--update]
+           [--model &lt;provider/id&gt;] [--context &lt;turn|branch|isolated&gt;]
+           [--headless] [--json] [--debug]</code></pre>
+                    <p>
+                        Ingests SOP inputs into <code>harness/sops/</code>, starts a pi session with
+                        the <a href="pi-extension.html">pi extension</a> loaded, authors one DML Skill
+                        per procedure, registers the router rows, and validates every artifact
+                        deterministically. Without <code>--update</code> it writes new skills only.
+                    </p>
+                    <p class="footnote">Bash is not enabled for authoring by default; SOP ingestion is done by the CLI itself.</p>
+                </section>
+
+                <section id="commit" class="docs-section reveal">
+                    <h2>commit</h2>
+                    <pre><code>s2h commit [-m &lt;message&gt;] [--major|--minor|--patch] [--no-tag] [--dry-run]</code></pre>
+                    <p>
+                        Runs <code>s2h check</code> first and refuses to commit an invalid harness.
+                        Bumps <code>harness.json.version</code> (patch by default), commits at the
+                        project root, tags <code>v&lt;version&gt;</code>, and appends a provenance
+                        record to <code>.s2h/versions.json</code>.
+                    </p>
+                </section>
+
+                <section id="export" class="docs-section reveal">
+                    <h2>export</h2>
+                    <pre><code>s2h export [--out &lt;dir&gt;] [--tag &lt;version&gt;] [--llm pi|openai-compatible]
+           [--sandbox agentvm|none] [--mcp|--no-mcp] [--no-web]
+           [--allow-effects] [--port &lt;n&gt;]</code></pre>
+                    <p>
+                        Generates a standalone project: server, web chat, MCP server,
+                        <code>Dockerfile</code>, compose file, <code>.env.example</code>, and a copy
+                        of the harness. <code>--allow-effects</code> is required to export a harness
+                        that writes external state; the default export is read-only.
+                    </p>
+                </section>
+
+                <section id="helpers" class="docs-section reveal">
+                    <h2>Helpers</h2>
+                    <ul>
+                        <li><code>s2h test</code> &mdash; validate, inspect diagrams, and smoke-run skills (<code>--live</code> for a real model).</li>
+                        <li><code>s2h list</code> &mdash; skills, SOPs, and versions.</li>
+                        <li><code>s2h status</code> &mdash; project, harness, and version state.</li>
+                        <li><code>s2h check</code> &mdash; deterministic validation only, no writes.</li>
+                    </ul>
+                    <p class="footnote">
+                        Planned helpers, wired into the CLI but not implemented yet:
+                        <code>s2h run</code>, <code>s2h config</code>, and <code>s2h doctor</code>.
+                    </p>
+                </section>
+
+                <section id="config" class="docs-section reveal">
+                    <h2>Config and models</h2>
+                    <p>
+                        <code>s2h create</code> and <code>s2h run</code> use pi's model runtime:
+                        <code>--model</code>, else <code>s2h.json</code>, else the pi default, with
+                        credentials reused from pi. The exported server selects its backend with
+                        <code>S2H_LLM_*</code> environment variables.
+                    </p>
+                    <p class="link-row">
+                        <a href="sop2harness.html">sop2harness guide &rarr;</a>
+                        <a href="sdk.html">DML SDK/CLI &rarr;</a>
+                        <a href="dml-language-reference.html">DML language reference &rarr;</a>
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Executable SOPs and specs for reliable, auditable agents.</p>
+            </div>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="https://github.com/deepclause/sop2harness" target="_blank" rel="noreferrer">sop2harness</a>
+                <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">DML SDK</a>
+                <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
