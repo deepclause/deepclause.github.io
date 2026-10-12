@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DeepClause — effortlessly build efficient model-, task-, or domain-specific harnesses</title>
+<meta name="robots" content="noindex">
+<style>
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Iosevka Term", "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  --bg: #f7f5f0;
+  --surface: #ffffff;
+  --surface-2: #f1eee7;
+  --ink: #16181d;
+  --muted: #5c6069;
+  --line: #e0dbd1;
+  --line-strong: #cac2b4;
+  --accent: #0a7a8c;
+  --accent-strong: #075463;
+  --accent-soft: rgba(10, 122, 140, 0.09);
+  --terminal-bg: #111628;
+  --terminal-header: #1b2440;
+  --terminal-ink: #e6f0ff;
+  --terminal-green: #8cf6b3;
+  --W: 1080px;
+  --H: 1080px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  -webkit-font-smoothing: antialiased;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: #000;
+}
+#stage {
+  position: relative;
+  width: var(--W);
+  height: var(--H);
+  overflow: hidden;
+  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 70%);
+}
+.scene {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 0 90px;
+  opacity: 0;
+  will-change: opacity, transform;
+}
+.eyebrow {
+  color: var(--accent-strong);
+  font-family: var(--font-mono);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* faint circuit traces, echoing the logo */
+#traces { position: absolute; inset: 0; pointer-events: none; }
+#traces path { fill: none; stroke: var(--accent); stroke-width: 2; opacity: 0.16; }
+#traces circle { fill: #fff; stroke: var(--accent); stroke-width: 2; opacity: 0.25; }
+
+/* persistent chrome */
+#header {
+  position: absolute; top: 0; left: 0; right: 0; height: 104px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 64px;
+  border-bottom: 1px solid var(--line);
+  background: rgba(247, 245, 240, 0.88);
+  opacity: 0;
+}
+.brand { display: inline-flex; align-items: center; gap: 16px; font-weight: 700; font-size: 30px; letter-spacing: -0.01em; }
+.brand img { height: 48px; width: auto; }
+.header-url { font-family: var(--font-mono); font-size: 22px; color: var(--muted); }
+#progress { position: absolute; left: 0; bottom: 0; height: 6px; background: var(--accent); width: 0; }
+
+/* scene 1: logo intro */
+#s1 .logo { width: 380px; height: auto; }
+#s1 .word { font-size: 104px; font-weight: 700; letter-spacing: -0.03em; margin-top: 18px; line-height: 1; }
+#s1 .eyebrow { margin-top: 34px; min-height: 30px; }
+
+/* scene 2: tagline build-up */
+#s2 { align-items: flex-start; padding: 104px 96px 0; }
+#s3, #s4 { padding-top: 104px !important; }
+#s2 .eyebrow { margin-bottom: 28px; }
+.tag-line { font-size: 98px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.06; }
+.tag-line .w { display: inline-block; }
+.slot {
+  position: relative; display: block; height: 116px; width: 100%; margin: 6px 0;
+}
+.slot .opt {
+  position: absolute; left: 0; top: 0; white-space: nowrap;
+  color: var(--accent);
+  font-size: 104px; font-weight: 800; letter-spacing: -0.035em; line-height: 1.06;
+}
+.slot .opt .u {
+  position: absolute; left: 0; bottom: -4px; height: 10px; border-radius: 6px;
+  background: var(--accent-soft); border: 1px solid rgba(10,122,140,0.22);
+}
+.caption-slot { position: relative; height: 44px; width: 100%; margin-top: 30px; }
+.caption-slot .cap {
+  position: absolute; left: 0; top: 0; white-space: nowrap;
+  font-size: 32px; color: var(--muted); font-weight: 500;
+}
+.caption-slot .cap code {
+  font-family: var(--font-mono); font-size: 0.86em; color: var(--accent-strong);
+  background: var(--accent-soft); border: 1px solid rgba(10,122,140,0.16);
+  border-radius: 8px; padding: 0.04em 0.34em;
+}
+
+/* scene 3: code card */
+#s3 { padding: 0 64px; }
+#s3 .head { width: 100%; margin-bottom: 30px; }
+#s3 h2 { font-size: 48px; letter-spacing: -0.025em; line-height: 1.08; margin: 14px 0 0; }
+.terminal-window {
+  width: 100%;
+  background: var(--terminal-bg);
+  border: 1px solid rgba(230, 240, 255, 0.14);
+  border-radius: 22px;
+  box-shadow: 0 18px 48px rgba(20, 22, 28, 0.14);
+  color: var(--terminal-ink);
+  overflow: hidden;
+}
+.terminal-header {
+  display: flex; justify-content: space-between; align-items: center;
+  background: var(--terminal-header);
+  color: rgba(230, 240, 255, 0.7);
+  font-family: var(--font-mono); font-size: 18px; letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 18px 28px;
+}
+.terminal-body {
+  font-family: var(--font-mono); font-size: 22px; line-height: 1.58;
+  padding: 22px 28px 24px; position: relative; white-space: pre;
+}
+.code-line { position: relative; min-height: 1.58em; }
+.code-line > .txt { position: relative; }
+.band {
+  position: absolute; left: -28px; right: -28px; top: 0; bottom: 0;
+  border-left: 5px solid transparent; opacity: 0;
+}
+.band.sec-s1 { background: rgba(127, 214, 227, 0.13); border-left-color: #7fd6e3; }
+.band.sec-rule { background: rgba(255, 211, 138, 0.13); border-left-color: #ffd38a; }
+.band.sec-s2 { background: rgba(196, 167, 255, 0.14); border-left-color: #c4a7ff; }
+.tk-c { color: rgba(230, 240, 255, 0.45); }
+.tk-s { color: var(--terminal-green); }
+.tk-p { color: #7fd6e3; }
+.tk-k { color: #ffd38a; }
+.tk-v { color: #e6f0ff; }
+.cursor { display: inline-block; width: 0.6em; height: 1.1em; background: var(--terminal-green); vertical-align: -0.15em; }
+.code-tag {
+  position: absolute; right: -6px; top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono); font-size: 17px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 5px 12px; border-radius: 999px; white-space: nowrap;
+}
+.tag-s1   { background: rgba(127, 214, 227, 0.16); color: #7fd6e3; border: 1px solid rgba(127,214,227,0.45); }
+.tag-rule { background: rgba(255, 211, 138, 0.14); color: #ffd38a; border: 1px solid rgba(255,211,138,0.45); }
+.tag-s2   { background: rgba(196, 167, 255, 0.16); color: #c4a7ff; border: 1px solid rgba(196,167,255,0.45); }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 26px; width: 100%; }
+.legend span {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: #fff; border: 1px solid var(--line); border-radius: 999px;
+  font-family: var(--font-mono); font-size: 17px; padding: 8px 14px; color: var(--ink);
+}
+.legend small { display: none; }
+.legend i { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+.legend .l-s1 i { background: #0a7a8c; }
+.legend .l-rule i { background: #c98a12; }
+.legend .l-s2 i { background: #7a56d6; }
+
+/* scene 3b: benefits */
+#s3b { align-items: flex-start; padding: 104px 72px 0; }
+#s3b .eyebrow { margin-bottom: 30px; }
+.benefit {
+  display: flex; align-items: flex-start; gap: 26px;
+  font-size: 60px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.12; margin: 6px 0;
+}
+.benefit .mark {
+  flex: none; width: 60px; height: 60px; border-radius: 18px; margin-top: 0.1em;
+  background: var(--accent-soft); border: 1px solid rgba(10,122,140,0.25);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--accent); font-size: 40px; font-weight: 800;
+}
+.benefit em { font-style: normal; color: var(--accent); }
+
+/* scene 4: why cards */
+#s4 { padding: 0 72px; }
+#s4 .head { width: 100%; margin-bottom: 34px; }
+#s4 h2 { font-size: 60px; letter-spacing: -0.025em; line-height: 1.08; margin: 14px 0 0; }
+.cards { display: grid; grid-template-columns: 1fr; gap: 20px; width: 100%; }
+.info-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(20, 22, 28, 0.06);
+  padding: 28px 32px; display: flex; gap: 26px; align-items: flex-start;
+}
+.info-card .num {
+  flex: none; width: 58px; height: 58px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft); border: 1px solid rgba(10,122,140,0.22);
+  color: var(--accent-strong); font-family: var(--font-mono); font-weight: 700; font-size: 24px;
+}
+.info-card h3 { margin: 0 0 6px; font-size: 34px; letter-spacing: -0.01em; }
+.info-card p { margin: 0; font-size: 25px; line-height: 1.45; color: var(--muted); }
+
+/* scene 5: end card */
+#s5 { padding: 0 90px; }
+#s5 .logo { width: 210px; height: auto; margin-bottom: 40px; }
+#s5 .final {
+  font-size: 80px; font-weight: 700; letter-spacing: -0.03em; line-height: 1.08; text-align: center;
+}
+#s5 .final em { font-style: normal; color: var(--accent); }
+#s5 .sub { margin-top: 30px; font-size: 32px; color: var(--muted); text-align: center; line-height: 1.4; }
+.button {
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--ink); color: #fff; border-radius: 16px;
+  font-size: 34px; font-weight: 600; padding: 22px 40px; margin-top: 44px;
+}
+.button-secondary { background: transparent; color: var(--ink); border: 1px solid var(--line-strong); font-family: var(--font-mono); font-size: 24px; font-weight: 500; padding: 16px 26px; margin-top: 18px; }
+
+/* vertical (9:16) adjustments */
+.tall #header { height: 150px; padding: 0 72px; }
+.tall .brand { font-size: 42px; gap: 20px; }
+.tall .brand img { height: 66px; }
+.tall .header-url { font-size: 30px; }
+.tall #progress { height: 10px; }
+.tall .eyebrow { font-size: 30px; text-wrap: balance; line-height: 1.5; }
+.tall #s1 .logo { width: 600px; }
+.tall #s1 .word { font-size: 150px; }
+.tall #s1 .eyebrow { font-size: 30px; margin-top: 44px; }
+.tall #s2 { padding: 150px 72px 0; }
+.tall #s2 .eyebrow { margin-bottom: 40px; }
+.tall #s2 .tag-line { font-size: 140px; line-height: 1.04; }
+.tall .slot { height: 150px; margin: 14px 0; }
+.tall .slot .opt { font-size: 124px; }
+.tall .caption-slot { height: 130px; margin-top: 56px; }
+.tall .caption-slot .cap { font-size: 46px; white-space: normal; line-height: 1.3; text-wrap: balance; }
+.tall #s3, .tall #s4 { padding: 150px 64px 0 !important; }
+.tall #s3 .head { margin-bottom: 44px; }
+.tall #s3 h2 { font-size: 76px; text-wrap: balance; }
+.tall #s3 h2 br { display: none; }
+.tall #s3 .terminal-header { font-size: 22px; padding: 22px 30px; }
+.tall #s3 .terminal-body { font-size: 28px; line-height: 1.72; padding: 26px 30px 30px; }
+.tall .code-line { min-height: 1.72em; }
+.tall .band { left: -30px; right: -30px; }
+.tall .code-tag { font-size: 19px; padding: 6px 13px; }
+.tall .legend { flex-direction: column; align-items: flex-start; gap: 14px; margin-top: 40px; }
+.tall .legend span { font-size: 28px; padding: 12px 22px; gap: 14px; }
+.tall .legend i { width: 16px; height: 16px; }
+.tall #s3b { padding: 150px 72px 0; }
+.tall #s3b .eyebrow { margin-bottom: 50px; line-height: 1.5; }
+.tall .benefit { font-size: 88px; gap: 34px; margin: 14px 0; line-height: 1.05; }
+.tall .benefit .mark { width: 84px; height: 84px; font-size: 50px; border-radius: 24px; margin-top: 0.08em; }
+.tall #s4 .head { margin-bottom: 50px; }
+.tall #s4 h2 { font-size: 84px; }
+.tall .cards { gap: 30px; }
+.tall .info-card { padding: 48px 44px; gap: 34px; border-radius: 28px; }
+.tall .info-card .num { width: 80px; height: 80px; font-size: 32px; border-radius: 20px; }
+.tall .info-card h3 { font-size: 54px; margin-bottom: 12px; }
+.tall .info-card p { font-size: 36px; }
+.tall #s5 .logo { width: 380px; margin-bottom: 60px; }
+.tall #s5 .final { font-size: 116px; }
+.tall .button { font-size: 50px; padding: 28px 52px; margin-top: 70px; border-radius: 20px; }
+.tall .button-secondary { font-size: 30px; padding: 20px 30px; margin-top: 24px; }
+
+/* landscape (16:9) layout, used on the website */
+.wide #header { height: 96px; padding: 0 80px; }
+.wide #s1 .logo { width: 330px; }
+.wide #s1 .word { font-size: 112px; }
+.wide #s2 { padding: 96px 0 0; align-items: center; }
+.wide #s2 > * { width: 960px; }
+.wide #s2 .tag-line { font-size: 104px; }
+.wide .slot { height: 128px; }
+.wide .slot .opt { font-size: 112px; }
+.wide .caption-slot .cap { font-size: 36px; }
+.wide #s3 {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.7fr);
+  grid-template-areas: "head head" "code legend";
+  column-gap: 48px; align-content: center; align-items: center;
+  padding: 96px 110px 0 !important;
+}
+.wide #s3 .head { grid-area: head; margin-bottom: 30px; }
+.wide #s3 h2 { font-size: 58px; }
+.wide #s3 .terminal-window { grid-area: code; }
+.wide #s3 .legend { grid-area: legend; flex-direction: column; align-items: flex-start; gap: 16px; margin-top: 0; }
+.wide .legend span {
+  display: grid; grid-template-columns: auto 1fr; column-gap: 12px; row-gap: 6px; align-items: center;
+  font-size: 21px; font-weight: 700; padding: 16px 22px; border-radius: 16px; width: 100%;
+  box-shadow: 0 8px 24px rgba(20, 22, 28, 0.06);
+}
+.wide .legend i { width: 14px; height: 14px; }
+.wide .legend small {
+  display: block; grid-column: 2; font-family: var(--font-sans); font-size: 19px; font-weight: 400; color: var(--muted);
+}
+.wide #s3b { padding: 96px 0 0; align-items: center; }
+.wide #s3b > * { width: 1080px; }
+.wide .benefit { font-size: 76px; }
+.wide #s4 { padding: 96px 110px 0 !important; }
+.wide #s4 .head { margin-bottom: 40px; }
+.wide #s4 h2 { font-size: 64px; }
+.wide .cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }
+.wide .info-card { flex-direction: column; gap: 20px; padding: 32px; }
+.wide #s5 .final { font-size: 88px; max-width: 1280px; }
+
+/* embedded on the website: no inner header, scaled to the frame */
+body.embed { background: transparent; overflow: hidden; }
+.embed #stage { transform-origin: 0 0; }
+.embed #header { display: none; }
+.embed #s2, .embed #s3, .embed #s3b, .embed #s4 { padding-top: 0 !important; }
+
+/* player controls (preview + website) */
+#controls {
+  position: fixed; right: 14px; bottom: 16px; display: flex; gap: 8px;
+  opacity: 0; transition: opacity 0.2s ease; z-index: 10;
+}
+body:hover #controls, #controls:focus-within, body.paused #controls { opacity: 1; }
+@media (hover: none) { #controls { opacity: 0.9; } }
+#controls[hidden] { display: none; }
+#controls button {
+  width: 38px; height: 38px; border-radius: 999px; cursor: pointer; padding: 0;
+  border: 1px solid var(--line-strong); background: rgba(255, 255, 255, 0.92);
+  color: var(--ink); font-size: 16px; line-height: 1;
+  display: inline-flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 14px rgba(20, 22, 28, 0.12);
+}
+#controls button:hover { border-color: var(--ink); }
+#controls button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<div id="stage">
+  <svg id="traces" viewBox="0 0 1080 1080" preserveAspectRatio="none"></svg>
+
+  <div id="header">
+    <div class="brand"><img src="../logo.png" alt=""><span>DeepClause</span></div>
+    <div class="header-url">deepclause.ai</div>
+  </div>
+
+  <!-- 1. intro -->
+  <section class="scene" id="s1">
+    <img class="logo" src="../logo.png" alt="DeepClause logo">
+    <div class="word">DeepClause</div>
+    <div class="eyebrow" id="s1-eyebrow"></div>
+  </section>
+
+  <!-- 2. tagline build-up -->
+  <section class="scene" id="s2">
+    <div class="eyebrow">Self-modifying agent harnesses</div>
+    <div class="tag-line" id="s2-l1"><span class="w">Effortlessly</span> <span class="w">build</span> <span class="w">efficient</span></div>
+    <div class="slot" id="slot">
+      <div class="opt" data-i="0">model-specific<span class="u"></span></div>
+      <div class="opt" data-i="1">task-specific<span class="u"></span></div>
+      <div class="opt" data-i="2">domain-specific<span class="u"></span></div>
+    </div>
+    <div class="tag-line" id="s2-l3"><span class="w">harnesses.</span></div>
+    <div class="caption-slot">
+      <div class="cap" data-i="0">Tuned to your model, even a small local one.</div>
+      <div class="cap" data-i="1">No 20-page prompt. Just the steps the job needs.</div>
+      <div class="cap" data-i="2">Your SOPs and policies, as Prolog clauses.</div>
+    </div>
+  </section>
+
+  <!-- 3. DML code -->
+  <section class="scene" id="s3">
+    <div class="head">
+      <div class="eyebrow">One program · one file</div>
+      <h2>System One and System Two thinking, <br>plus deterministic rules.</h2>
+    </div>
+    <div class="terminal-window">
+      <div class="terminal-header"><span>claims.dml</span><span>DML</span></div>
+      <div class="terminal-body" id="code"></div>
+    </div>
+    <div class="legend" id="legend">
+      <span class="l-s1"><i></i>System 1 · fast judgment<small>Calibrated choices and probabilities</small></span>
+      <span class="l-rule"><i></i>Rules · deterministic<small>Limits and guards decided in Prolog</small></span>
+      <span class="l-s2"><i></i>System 2 · deep reasoning<small>A strong model, only when needed</small></span>
+    </div>
+  </section>
+
+  <!-- 3b. benefits -->
+  <section class="scene" id="s3b">
+    <div class="eyebrow">The model does less. The program does more.</div>
+    <div class="benefit"><span class="mark">✓</span><span><em>Lower</em> cost</span></div>
+    <div class="benefit"><span class="mark">✓</span><span><em>More</em> determinism</span></div>
+    <div class="benefit"><span class="mark">✓</span><span><em>Better</em> instruction following</span></div>
+    <div class="benefit"><span class="mark">✓</span><span><em>Fully</em> auditable</span></div>
+  </section>
+
+  <!-- 4. why -->
+  <section class="scene" id="s4">
+    <div class="head">
+      <div class="eyebrow">Why DeepClause</div>
+      <h2>Harnesses you can read, rerun, and review.</h2>
+    </div>
+    <div class="cards">
+      <div class="info-card"><div class="num">01</div><div><h3>Reproducible</h3><p>Control flow, retries, and validation are clauses — the model is consulted only where you choose.</p></div></div>
+      <div class="info-card"><div class="num">02</div><div><h3>Auditable</h3><p>Every turn is a transaction: snapshot, commit, trace, rollback.</p></div></div>
+      <div class="info-card"><div class="num">03</div><div><h3>Portable</h3><p>SWI-Prolog in WebAssembly. One self-contained module, nothing native to install.</p></div></div>
+    </div>
+  </section>
+
+  <!-- 5. end card -->
+  <section class="scene" id="s5">
+    <img class="logo" src="../logo.png" alt="">
+    <div class="final">Effortlessly build efficient <em>model&#8209;, task&#8209;, or domain&#8209;specific</em> harnesses.</div>
+    <div class="button">deepclause.ai</div>
+    <div class="button button-secondary">github.com/deepclause/deepclause-sdk</div>
+  </section>
+
+  <div id="progress"></div>
+</div>
+<div id="controls" hidden>
+  <button type="button" id="btn-play" aria-label="Pause"></button>
+  <button type="button" id="btn-replay" aria-label="Replay from the start"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.34-5.66" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="M4 4v5h5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+</div>
+
+<script>
+(() => {
+  const params = new URLSearchParams(location.search);
+  const W = +(params.get('w') || 1080), H = +(params.get('h') || 1080);
+  document.documentElement.style.setProperty('--W', W + 'px');
+  document.documentElement.style.setProperty('--H', H + 'px');
+  if (H > W * 1.3) document.body.classList.add('tall');
+  if (W > H * 1.3) document.body.classList.add('wide');
+  const EMBED = params.has('embed');
+  if (EMBED) document.body.classList.add('embed');
+
+  const DURATION = 24.0;
+  window.DURATION = DURATION;
+
+  // ---------- helpers ----------
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const prog = (t, start, dur) => clamp((t - start) / dur);
+  const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+  const easeInOut = (x) => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  const easeBack = (x) => { const c1 = 1.5, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+  const $ = (s) => document.querySelector(s);
+  const $$ = (s) => Array.from(document.querySelectorAll(s));
+  // window visibility: fade in at a, fade out at b
+  const win = (t, a, b, fi = 0.45, fo = 0.4) => Math.min(easeOut(prog(t, a, fi)), 1 - easeInOut(prog(t, b - fo, fo)));
+
+  // ---------- background traces ----------
+  const svg = $('#traces');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  const traces = [];
+  const mk = (d, cx, cy) => {
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', d); svg.appendChild(p);
+    const c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    c.setAttribute('cx', cx); c.setAttribute('cy', cy); c.setAttribute('r', 9); svg.appendChild(c);
+    traces.push({ p, c });
+  };
+  // left side traces converging, like the logo
+  const ys = [0.18, 0.34, 0.66, 0.82].map((f) => f * H);
+  mk(`M 30 ${ys[0]} L ${W*0.12} ${ys[0]} L ${W*0.2} ${H*0.42}`, 30, ys[0]);
+  mk(`M 60 ${ys[1]} L ${W*0.1} ${ys[1]} L ${W*0.16} ${H*0.46}`, 60, ys[1]);
+  mk(`M 60 ${ys[2]} L ${W*0.1} ${ys[2]} L ${W*0.16} ${H*0.54}`, 60, ys[2]);
+  mk(`M 30 ${ys[3]} L ${W*0.12} ${ys[3]} L ${W*0.2} ${H*0.58}`, 30, ys[3]);
+  // right side
+  mk(`M ${W-30} ${ys[0]} L ${W*0.88} ${ys[0]} L ${W*0.8} ${H*0.42}`, W-30, ys[0]);
+  mk(`M ${W-60} ${ys[1]} L ${W*0.9} ${ys[1]} L ${W*0.84} ${H*0.46}`, W-60, ys[1]);
+  mk(`M ${W-60} ${ys[2]} L ${W*0.9} ${ys[2]} L ${W*0.84} ${H*0.54}`, W-60, ys[2]);
+  mk(`M ${W-30} ${ys[3]} L ${W*0.88} ${ys[3]} L ${W*0.8} ${H*0.58}`, W-30, ys[3]);
+  traces.forEach(({ p }) => { const L = p.getTotalLength(); p.dataset.len = L; p.style.strokeDasharray = L; });
+
+  // ---------- code card ----------
+  // [segments, section]  sections: s1 = System 1, rule = deterministic, s2 = System 2
+  const code = [
+    [[['limit', 'p'], ['(auto, ', 'v'], ['5000', 'k'], [').', 'v']], 'rule'],
+    [[['limit', 'p'], ['(home, ', 'v'], ['2000', 'k'], [').', 'v']], 'rule'],
+    [[['', 'v']], null],
+    [[['agent_main', 'p'], ['(Claim, Amount) :-', 'v']], null],
+    [[['    with_judgment', 'p'], ['(jev, ', 'v'], ['judge', 'p'], ['(Claim, [', 'v']], 's1'],
+    [[['        choose', 'p'], ['(', 'v'], ['"Which desk?"', 's'], [', [auto, home]) - Desk,', 'v']], 's1'],
+    [[['        probability', 'p'], ['(', 'v'], ['"Is it fraudulent?"', 's'], [') - Risk ])),', 'v']], 's1'],
+    [[['    (   ', 'v'], ['limit', 'p'], ['(Desk, Max), ', 'v'], ['Amount =< Max, Risk < 0.1', 'k']], 'rule'],
+    [[['    ->  ', 'v'], ['answer', 'p'], ['(', 'v'], ['"Approved"', 's'], [')', 'v']], 'rule'],
+    [[['    ;   ', 'v'], ['with_model', 'p'], ['(', 'v'], ['"openai:gpt-5#high"', 's'], [',', 'v']], 's2'],
+    [[['            task', 'p'], ['(', 'v'], ['"Investigate {Claim}."', 's'], [',', 'v']], 's2'],
+    [[['                 string', 'k'], ['(Review))),', 'v']], 's2'],
+    [[['        answer', 'p'], ['(Review)', 'v']], 's2'],
+    [[['    ).', 'v']], null],
+  ];
+  const TALL = H > W * 1.3;
+  const tags = TALL
+    ? { 0: ['rule', 'deterministic rules'], 4: ['s1', 'system 1'], 9: ['s2', 'system 2'] }
+    : { 0: ['rule', 'deterministic rules'], 4: ['s1', 'system 1 · judgment'], 9: ['s2', 'system 2 · reasoning'] };
+  const codeEl = $('#code');
+  const lineEls = code.map(([segs, sec], i) => {
+    const row = document.createElement('div');
+    row.className = 'code-line';
+    if (sec) {
+      const band = document.createElement('div');
+      band.className = `band sec-${sec}`;
+      row.appendChild(band);
+      row._band = band;
+    }
+    row._sec = sec;
+    const text = document.createElement('span');
+    text.className = 'txt';
+    row.appendChild(text);
+    if (tags[i]) {
+      const tg = document.createElement('span');
+      tg.className = `code-tag tag-${tags[i][0]}`;
+      tg.textContent = tags[i][1];
+      row.appendChild(tg);
+      row._tag = tg;
+    }
+    row._text = text;
+    row._segs = segs;
+    row._len = segs.reduce((n, [s]) => n + s.length, 0);
+    codeEl.appendChild(row);
+    return row;
+  });
+  const totalChars = lineEls.reduce((n, r) => n + r._len, 0);
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  function renderCode(chars, showCursor) {
+    let left = chars;
+    let cursorPlaced = false;
+    lineEls.forEach((row) => {
+      let html = '';
+      for (const [s, cls] of row._segs) {
+        if (left <= 0) break;
+        const part = s.slice(0, left);
+        left -= part.length;
+        html += `<span class="tk-${cls}">${esc(part)}</span>`;
+      }
+      const done = chars >= 0 && left >= 0 && html.length > 0;
+      if (!cursorPlaced && showCursor && (left <= 0)) {
+        if (html.length > 0 || row === lineEls[0]) { html += '<span class="cursor"></span>'; cursorPlaced = true; }
+      }
+      if (row._htmlCache !== html) { row._text.innerHTML = html; row._htmlCache = html; }
+    });
+  }
+
+  const s1Eyebrow = 'Agent harnesses as logic programs';
+
+  // ---------- main render ----------
+  window.render = function render(t) {
+    // background traces draw in, then breathe
+    traces.forEach(({ p, c }, i) => {
+      const L = +p.dataset.len;
+      const k = easeInOut(prog(t, 0.1 + i * 0.06, 1.2));
+      p.style.strokeDashoffset = L * (1 - k);
+      c.style.opacity = 0.25 * k;
+    });
+    svg.style.opacity = 1 - 0.6 * easeInOut(prog(t, 7.6, 0.6)) + 0.6 * easeInOut(prog(t, 20.0, 0.8));
+
+    // header (after intro), hidden on end card
+    const hdr = win(t, 2.8, 20.6, 0.5, 0.5);
+    $('#header').style.opacity = hdr;
+    $('#header').style.transform = `translateY(${-30 * (1 - easeOut(prog(t, 2.8, 0.5)))}px)`;
+    $('#progress').style.width = `${(t / DURATION) * 100}%`;
+
+    // ---- S1: intro 0 – 3.0
+    {
+      const el = $('#s1');
+      el.style.opacity = win(t, 0, 3.0, 0.01, 0.45);
+      const lk = easeBack(prog(t, 0.15, 0.8));
+      const logo = $('#s1 .logo');
+      logo.style.opacity = easeOut(prog(t, 0.15, 0.5));
+      logo.style.transform = `scale(${0.7 + 0.3 * lk})`;
+      const word = $('#s1 .word');
+      word.style.opacity = easeOut(prog(t, 0.65, 0.5));
+      word.style.transform = `translateY(${30 * (1 - easeOut(prog(t, 0.65, 0.6)))}px)`;
+      const n = Math.floor(s1Eyebrow.length * prog(t, 1.2, 0.9));
+      $('#s1-eyebrow').textContent = s1Eyebrow.slice(0, n);
+      el.style.transform = `scale(${1 - 0.06 * easeInOut(prog(t, 2.55, 0.45))})`;
+    }
+
+    // ---- S2: tagline build 3.0 – 8.6
+    {
+      const el = $('#s2');
+      el.style.opacity = win(t, 3.0, 8.6, 0.3, 0.45);
+      el.style.transform = `translateY(${-20 * easeInOut(prog(t, 8.15, 0.45))}px)`;
+      $('#s2 .eyebrow').style.opacity = easeOut(prog(t, 3.05, 0.4));
+      $$('#s2-l1 .w').forEach((w, i) => {
+        const k = easeOut(prog(t, 3.15 + i * 0.16, 0.45));
+        w.style.opacity = k;
+        w.style.transform = `translateY(${36 * (1 - k)}px)`;
+      });
+      const l3 = $('#s2-l3 .w');
+      const k3 = easeOut(prog(t, 3.75, 0.45));
+      l3.style.opacity = k3;
+      l3.style.transform = `translateY(${36 * (1 - k3)}px)`;
+
+      // rotating slot: model (3.9-5.4) -> task (5.4-6.9) -> domain (6.9-)
+      const starts = [3.9, 5.35, 6.8];
+      const ends = [5.35, 6.8, 99];
+      $$('#slot .opt').forEach((o, i) => {
+        const kin = easeOut(prog(t, starts[i], 0.35));
+        const kout = easeInOut(prog(t, ends[i] - 0.3, 0.26));
+        o.style.opacity = kin * (1 - kout);
+        o.style.transform = `translateY(${50 * (1 - kin) - 50 * kout}px)`;
+        const u = o.querySelector('.u');
+        u.style.width = `${100 * easeInOut(prog(t, starts[i] + 0.25, 0.55))}%`;
+      });
+      $$('.caption-slot .cap').forEach((c, i) => {
+        const kin = easeOut(prog(t, starts[i] + 0.2, 0.4));
+        const kout = easeInOut(prog(t, ends[i] - 0.3, 0.26));
+        c.style.opacity = kin * (1 - kout);
+        c.style.transform = `translateX(${24 * (1 - kin)}px)`;
+      });
+    }
+
+    // ---- S3: DML code 8.6 – 14.8
+    {
+      const el = $('#s3');
+      el.style.opacity = win(t, 8.6, 14.8, 0.45, 0.45);
+      const k = easeOut(prog(t, 8.6, 0.6));
+      $('#s3 .head').style.transform = `translateY(${30 * (1 - k)}px)`;
+      $('#s3 .terminal-window').style.transform = `translateY(${60 * (1 - easeOut(prog(t, 8.75, 0.7)))}px)`;
+      const chars = Math.floor(totalChars * prog(t, 9.1, 2.6));
+      const blink = Math.floor(t * 2.5) % 2 === 0;
+      renderCode(chars, blink || chars < totalChars);
+      // highlight sections in execution order: System 1 -> rules -> System 2
+      const secStart = { s1: 11.9, rule: 12.5, s2: 13.1 };
+      lineEls.forEach((row) => {
+        if (!row._band) return;
+        row._band.style.opacity = easeOut(prog(t, secStart[row._sec], 0.35));
+      });
+      Object.keys(tags).forEach((i) => {
+        const tg = lineEls[i]._tag;
+        const kk = easeBack(prog(t, secStart[tags[i][0]] + 0.05, 0.45));
+        tg.style.opacity = clamp(kk);
+        tg.style.transform = `translateY(-50%) scale(${0.6 + 0.4 * kk})`;
+      });
+      const legendStart = [secStart.s1, secStart.rule, secStart.s2];
+      $$('#legend span').forEach((s, i) => {
+        const kk = easeOut(prog(t, legendStart[i], 0.4));
+        s.style.opacity = kk;
+        s.style.transform = `translateY(${16 * (1 - kk)}px)`;
+      });
+    }
+
+    // ---- S3b: benefits 14.8 – 17.6
+    {
+      const el = $('#s3b');
+      el.style.opacity = win(t, 14.8, 17.6, 0.35, 0.4);
+      $('#s3b .eyebrow').style.opacity = easeOut(prog(t, 14.85, 0.4));
+      $$('#s3b .benefit').forEach((b, i) => {
+        const kk = easeOut(prog(t, 15.0 + i * 0.32, 0.45));
+        b.style.opacity = kk;
+        b.style.transform = `translateX(${-60 * (1 - kk)}px)`;
+        const m = b.querySelector('.mark');
+        m.style.transform = `scale(${0.4 + 0.6 * easeBack(prog(t, 15.1 + i * 0.32, 0.45))})`;
+      });
+    }
+
+    // ---- S4: why 17.6 – 20.6
+    {
+      const el = $('#s4');
+      el.style.opacity = win(t, 17.6, 20.6, 0.4, 0.4);
+      const k = easeOut(prog(t, 17.6, 0.5));
+      $('#s4 .head').style.transform = `translateY(${30 * (1 - k)}px)`;
+      $$('#s4 .info-card').forEach((c, i) => {
+        const kk = easeOut(prog(t, 17.8 + i * 0.2, 0.5));
+        c.style.opacity = kk;
+        c.style.transform = `translateX(${80 * (1 - kk)}px)`;
+      });
+    }
+
+    // ---- S5: end card 20.6 – end
+    {
+      const el = $('#s5');
+      el.style.opacity = easeOut(prog(t, 20.6, 0.5));
+      const lk = easeBack(prog(t, 20.6, 0.7));
+      const logo = $('#s5 .logo');
+      logo.style.transform = `scale(${0.7 + 0.3 * lk})`;
+      const f = $('#s5 .final');
+      const kf = easeOut(prog(t, 20.8, 0.6));
+      f.style.opacity = kf;
+      f.style.transform = `translateY(${30 * (1 - kf)}px)`;
+      $$('#s5 .button').forEach((b, i) => {
+        const kk = easeOut(prog(t, 21.4 + i * 0.2, 0.5));
+        b.style.opacity = kk;
+        b.style.transform = `translateY(${20 * (1 - kk)}px)`;
+      });
+    }
+  };
+
+  // ---------- player (preview + website embed) ----------
+  if (params.has('capture')) {
+    render(0);
+    return;
+  }
+  const HOLD = 3.0;          // seconds to hold the end card before looping
+  const LOOP_START = 2.9;    // later loops skip the logo intro
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const stage = $('#stage');
+  const controls = $('#controls');
+  const btnPlay = $('#btn-play');
+  const btnReplay = $('#btn-replay');
+  controls.hidden = false;
+
+  const fit = () => {
+    if (!EMBED) return;
+    const k = Math.min(window.innerWidth / W, window.innerHeight / H);
+    stage.style.transform = `scale(${k})`;
+  };
+  window.addEventListener('resize', fit);
+  fit();
+
+  let t = reduced ? DURATION : 0;
+  let userPaused = reduced;   // user intent
+  let hostPaused = false;     // paused by the page (offscreen / hidden tab)
+  let last = performance.now();
+  const playing = () => !userPaused && !hostPaused && !document.hidden;
+  const syncButton = () => {
+    const p = !userPaused;
+    btnPlay.innerHTML = p
+      ? '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1" fill="currentColor"/><rect x="14" y="5" width="4" height="14" rx="1" fill="currentColor"/></svg>'
+      : '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z" fill="currentColor"/></svg>';
+    btnPlay.setAttribute('aria-label', p ? 'Pause' : 'Play');
+    document.body.classList.toggle('paused', !p);
+  };
+  const tick = (now) => {
+    const dt = Math.min(0.1, (now - last) / 1000);
+    last = now;
+    if (playing()) {
+      t += dt;
+      if (t > DURATION + HOLD) t = LOOP_START;
+    }
+    render(Math.min(t, DURATION));
+    requestAnimationFrame(tick);
+  };
+  btnPlay.addEventListener('click', () => {
+    userPaused = !userPaused;
+    if (!userPaused && t >= DURATION) t = LOOP_START;
+    syncButton();
+  });
+  btnReplay.addEventListener('click', () => { t = 0; userPaused = false; syncButton(); });
+  window.addEventListener('message', (e) => {
+    if (!e.data || e.data.dcFilm == null) return;
+    if (e.data.dcFilm === 'pause') hostPaused = true;
+    if (e.data.dcFilm === 'play') hostPaused = false;
+  });
+  syncButton();
+  requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

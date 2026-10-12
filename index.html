@@ -5,6 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="DeepClause turns SOPs and specifications into executable logic programs. Deterministic rule-based orchestration, typed LLM steps, per-phase tool scoping, static taint analysis, local models, and a portable WASM/AgentVM sandbox. Start with sop2harness, the CLI that turns SOPs into a versioned harness, or the pi extension.">
     <title>DeepClause — executable SOPs and specs for reliable, auditable agents</title>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://deepclause.ai/">
+    <meta property="og:title" content="DeepClause — efficient model-, task-, or domain-specific harnesses">
+    <meta property="og:description" content="System One and System Two thinking, plus deterministic rules, in one inspectable DML program.">
+    <meta property="og:image" content="https://deepclause.ai/images/og-deepclause.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@hilbertshelper">
+    <meta name="twitter:image" content="https://deepclause.ai/images/og-deepclause.png">
+    <link rel="icon" type="image/png" href="logo.png">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
     <noscript><style>.reveal{opacity:1;transform:none}</style></noscript>
@@ -31,51 +40,27 @@
     <main id="top">
         <section class="hero">
             <div class="container">
-                <div class="hero-grid">
-                    <div class="hero-copy reveal">
-                        <p class="eyebrow">Neurosymbolic AI for accountable agents</p>
-                        <h1>Build domain-specific harnesses for regulated verticals.</h1>
-                        <p class="hero-sub">Turn SOPs and specs into agents you can audit.</p>
-                        <p class="lead">
-                            DeepClause turns specs and SOPs into executable logic programs —
-                            deterministic rules for what must never go wrong, scoped LLM steps for
-                            the rest.
-                        </p>
-                        <div class="hero-actions">
-                            <a class="button button-primary" href="docs/sop2harness.html">Get started with sop2harness</a>
-                            <a class="button button-secondary" href="https://github.com/deepclause/sop2harness" target="_blank" rel="noreferrer">SDK &amp; CLI</a>
-                            <a class="button button-secondary" href="docs/index.html">Docs</a>
-                        </div>
-                    </div>
-                    <div class="terminal-card reveal">
-                        <div class="terminal-window" aria-label="sop2harness CLI workflow and exported chat demo">
-                            <div class="terminal-header">
-                                <span id="hero-title">terminal</span>
-                                <span id="hero-meta">sop2harness CLI</span>
-                            </div>
-                            <div class="terminal-body" id="terminal-content"></div>
-                            <div class="chat-body" id="chat-content" hidden></div>
-                        </div>
-                    </div>
+                <h1 class="visually-hidden">DeepClause: effortlessly build efficient model-, task-, or domain-specific harnesses.</h1>
+                <div class="film-frame reveal" id="film-frame">
+                    <iframe id="hero-film"
+                            title="DeepClause in 24 seconds: System One and System Two thinking, plus deterministic rules"
+                            data-src-wide="film/index.html?w=1600&amp;h=900&amp;embed=1"
+                            data-src-square="film/index.html?w=1080&amp;h=1080&amp;embed=1"
+                            loading="eager"></iframe>
+                    <noscript><img src="images/og-deepclause.png" alt="Effortlessly build efficient model-, task-, or domain-specific harnesses."></noscript>
                 </div>
-                <div class="pipeline reveal" aria-label="DeepClause pipeline">
-                    <span>SOP</span>
-                    <span class="pipeline-arrow">&rarr;</span>
-                    <span>s2h create</span>
-                    <span class="pipeline-arrow">&rarr;</span>
-                    <span>harness</span>
-                    <span class="pipeline-arrow">&rarr;</span>
-                    <span>export</span>
-                    <span class="pipeline-arrow">&rarr;</span>
-                    <span>chat / MCP</span>
+                <div class="hero-bar reveal">
+                    <p class="hero-note">
+                        Fast judgment, deep reasoning, and deterministic rules in one inspectable DML program.
+                    </p>
+                    <div class="hero-actions">
+                        <a class="button button-primary" href="docs/sdk.html">Get started</a>
+                        <a class="button button-secondary" href="docs/pi-extension.html">pi extension</a>
+                        <a class="button button-secondary" href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+                    </div>
                 </div>
             </div>
         </section>
-
-
-
-
-
 
         <section id="what" class="section">
             <div class="container">
@@ -285,11 +270,21 @@ flowchart LR
                             Point DeepClause at Ollama, vLLM, LM Studio, or any OpenAI-compatible
                             server, and your data stays on the machine.
                         </p>
-                        <p class="lift-note">
-                            <strong>Measured lift.</strong> On DeepPlanning travel planning, DeepClause
-                            raised a <strong>35B local model from 22.2% to 42.9% composite</strong> and
-                            from <strong>82.5% to 98.3% task delivery</strong>.
-                        </p>
+                        <div class="lift-note">
+                            <p><strong>Measured lift.</strong> DeepPlanning travel planning, 35B local model:</p>
+                            <div class="stat-row">
+                                <div class="stat">
+                                    <span class="stat-from">from 22.2%</span>
+                                    <span class="stat-to">42.9%</span>
+                                    <span class="stat-label">composite score</span>
+                                </div>
+                                <div class="stat">
+                                    <span class="stat-from">from 82.5%</span>
+                                    <span class="stat-to">98.3%</span>
+                                    <span class="stat-label">task delivery</span>
+                                </div>
+                            </div>
+                        </div>
                     </article>
                 </div>
             </div>

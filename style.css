@@ -196,206 +196,74 @@ code {
 
 /* ---- hero ---- */
 
+.visually-hidden {
+  border: 0;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
 .hero {
-  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
+  background:
+    radial-gradient(1100px 420px at 50% 0%, rgba(10, 122, 140, 0.08), transparent 70%),
+    linear-gradient(180deg, #ffffff 0%, var(--bg) 100%);
   border-bottom: 1px solid var(--line);
-  padding: 88px 0 76px;
+  padding: 48px 0 56px;
 }
 
-.hero-grid {
+/* the hero film: an HTML animation (film/index.html) in a 16:9 frame */
+.film-frame {
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(180deg, #ffffff 0%, var(--bg) 70%);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 24px 60px -24px rgba(20, 22, 28, 0.22),
+    0 8px 24px rgba(20, 22, 28, 0.06);
+  overflow: hidden;
+  position: relative;
+}
+
+.film-frame.is-square {
+  aspect-ratio: 1 / 1;
+}
+
+.film-frame iframe,
+.film-frame img {
+  border: 0;
+  display: block;
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.hero-bar {
   align-items: center;
-  display: grid;
-  gap: 56px;
-  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 28px;
+  justify-content: space-between;
+  margin-top: 28px;
 }
 
-.hero-copy h1 {
-  font-size: clamp(2rem, 4.2vw, 3rem);
-  letter-spacing: -0.025em;
-  line-height: 1.06;
-  margin: 14px 0 16px;
-}
-
-.hero-sub {
-  color: var(--ink);
-  font-size: clamp(1.05rem, 1.5vw, 1.22rem);
-  font-weight: 500;
-  line-height: 1.45;
-  margin: 0 0 16px;
-  max-width: 42ch;
-}
-
-.lead {
+.hero-note {
   color: var(--muted);
   font-size: 1.06rem;
-  line-height: 1.6;
-  max-width: 56ch;
+  line-height: 1.5;
+  max-width: 52ch;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin-top: 26px;
-}
-
-.pipeline {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 40px;
-}
-
-.pipeline span {
-  background: #fff;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
-  padding: 6px 11px;
-}
-
-.pipeline .pipeline-arrow {
-  background: transparent;
-  border: 0;
-  color: var(--accent-strong);
-  font-weight: 700;
-  padding: 0;
-}
-
-.terminal-card {
-  display: flex;
-  justify-content: center;
-}
-
-.terminal-window {
-  background: var(--terminal-bg);
-  border: 1px solid rgba(230, 240, 255, 0.14);
-  border-radius: 16px;
-  box-shadow: var(--shadow);
-  color: var(--terminal-ink);
-  overflow: hidden;
-  width: min(100%, 520px);
-}
-
-.terminal-header {
-  align-items: center;
-  background: var(--terminal-header);
-  color: rgba(230, 240, 255, 0.7);
-  display: flex;
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  justify-content: space-between;
-  letter-spacing: 0.08em;
-  padding: 11px 16px;
-  text-transform: uppercase;
-}
-
-.terminal-body {
-  color: var(--terminal-green);
-  font-family: var(--font-mono);
-  font-size: 0.84rem;
-  height: 480px;
-  line-height: 1.5;
-  overflow: hidden;
-  padding: 20px;
-  white-space: pre-wrap;
-}
-
-.terminal-line {
-  margin-bottom: 6px;
-}
-
-.terminal-line.diagram {
-  color: rgba(230, 240, 255, 0.82);
-}
-
-.terminal-line.output {
-  color: rgba(230, 240, 255, 0.9);
-}
-
-.terminal-line.muted {
-  color: rgba(230, 240, 255, 0.58);
-}
-
-/* ---- hero chat demo ---- */
-
-.chat-body {
-  color: var(--terminal-ink);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  height: 480px;
-  overflow: hidden;
-  padding: 20px;
-  white-space: normal;
-}
-
-.chat-body[hidden] {
-  display: none;
-}
-
-.chat-msg {
-  border-radius: 14px;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  max-width: 88%;
-  padding: 10px 13px;
-}
-
-.chat-msg.user {
-  align-self: flex-end;
-  background: var(--accent);
-  border-bottom-right-radius: 4px;
-  color: #fff;
-}
-
-.chat-msg.assistant {
-  align-self: flex-start;
-  background: rgba(230, 240, 255, 0.09);
-  border: 1px solid rgba(230, 240, 255, 0.14);
-  border-bottom-left-radius: 4px;
-  color: var(--terminal-green);
-  white-space: pre-wrap;
-}
-
-.chat-msg.route,
-.chat-msg.tool {
-  align-self: flex-start;
-  background: transparent;
-  border: 1px dashed rgba(230, 240, 255, 0.24);
-  color: rgba(230, 240, 255, 0.62);
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  padding: 5px 10px;
-}
-
-.chat-msg.tool {
-  border-style: solid;
-  border-color: rgba(140, 246, 179, 0.3);
-  color: rgba(140, 246, 179, 0.82);
-}
-
-.chat-msg.usage {
-  align-self: flex-end;
-  background: transparent;
-  color: rgba(230, 240, 255, 0.45);
-  font-family: var(--font-mono);
-  font-size: 0.66rem;
-  padding: 0 2px;
-}
-
-.chat-msg.typing::after {
-  animation: chat-blink 0.9s steps(1) infinite;
-  content: "\258D";
-  margin-left: 1px;
-}
-
-@keyframes chat-blink {
-  50% {
-    opacity: 0;
-  }
 }
 
 /* ---- sections ---- */
@@ -453,6 +321,12 @@ code {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 22px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.info-card:hover {
+  border-color: rgba(10, 122, 140, 0.35);
+  box-shadow: var(--shadow);
 }
 
 .info-card p {
@@ -491,6 +365,41 @@ code {
 
 .lift-note strong {
   color: var(--ink);
+}
+
+.stat-row {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.stat {
+  background: var(--accent-soft);
+  border: 1px solid rgba(10, 122, 140, 0.18);
+  border-radius: 12px;
+  display: grid;
+  gap: 2px;
+  padding: 14px 16px;
+}
+
+.stat-from {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+}
+
+.stat-to {
+  color: var(--accent-strong);
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.stat-label {
+  color: var(--muted);
+  font-size: 0.82rem;
 }
 
 .mini-note {
@@ -888,7 +797,6 @@ code {
 /* ---- responsive ---- */
 
 @media (max-width: 980px) {
-  .hero-grid,
   .screenshot-layout,
   .two-column,
   .three-up,
@@ -904,7 +812,7 @@ code {
   }
 
   .hero {
-    padding: 64px 0 56px;
+    padding: 28px 0 44px;
   }
 
   .section {
@@ -913,6 +821,15 @@ code {
 }
 
 @media (max-width: 720px) {
+  .film-frame {
+    border-radius: 16px;
+  }
+
+  .hero-bar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .header-inner,
   .footer-inner {
     align-items: flex-start;
@@ -921,12 +838,6 @@ code {
 
   .site-nav {
     gap: 14px;
-  }
-
-  .terminal-body {
-    font-size: 0.8rem;
-    height: 480px;
-    padding: 16px;
   }
 
   .mermaid {
