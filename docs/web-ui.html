@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Guide to the DeepClause Web UI at web.deepclause.ai: onboarding, Develop and Work modes, sessions, workflow runs, files, models, privacy, and mobile use.">
+    <title>Web UI — DeepClause docs</title>
+    <link rel="stylesheet" href="../style.css">
+    <link rel="stylesheet" href="docs.css">
+</head>
+<body>
+    <header class="site-header">
+        <div class="container header-inner">
+            <a class="brand" href="../index.html">
+                <img src="../logo.png" alt="DeepClause logo">
+                <span>DeepClause</span>
+            </a>
+            <nav class="site-nav">
+                <a href="index.html">Docs</a>
+                <a href="sop2harness.html">sop2harness</a>
+                <a href="pi-extension.html">pi extension</a>
+                <a href="web-ui.html" class="active">Web UI</a>
+                <a href="dml-language-reference.html">DML reference</a>
+                <a href="sdk.html">DML SDK/CLI</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">GitHub</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="doc-page">
+        <div class="container docs-shell">
+            <aside class="docs-sidebar">
+                <nav>
+                    <p class="sidebar-label">Guides</p>
+                    <a href="index.html">Documentation</a>
+                    <a href="sop2harness.html">sop2harness</a>
+                    <a href="pi-extension.html">pi extension</a>
+                    <a href="web-ui.html" class="active">Web UI</a>
+                    <a href="speckit.html" class="tree-1">SDD &middot; SpecKit</a>
+                    <a href="handbook.html" class="tree-1">Handbook &rarr; DML</a>
+                    <a href="dml-sdk-guide.html">DML SDK &amp; CLI</a>
+                    <a href="decision-models.html">Decision models</a>
+                    <p class="sidebar-label">Reference</p>
+                    <a href="dml-language-reference.html">DML language reference</a>
+                    <a href="dml-language-examples.html">DML language examples</a>
+                    <a href="sdk.html">DML SDK/CLI</a>
+                    <a href="sdk-api-reference.html" class="tree-1">API reference</a>
+                    <a href="sop2harness-cli.html">Sop2Harness CLI</a>
+                    <p class="sidebar-label">On this page</p>
+                    <a href="#overview">Overview</a>
+                    <a href="#onboarding">Onboarding</a>
+                    <a href="#home">Home</a>
+                    <a href="#develop">Develop</a>
+                    <a href="#work">Work</a>
+                    <a href="#files">Files</a>
+                    <a href="#models">Models and credentials</a>
+                    <a href="#privacy">Privacy and storage</a>
+                    <a href="#mobile">Mobile</a>
+                    <a href="#troubleshooting">Troubleshooting</a>
+                </nav>
+            </aside>
+
+            <div class="docs-content">
+                <header class="docs-intro reveal">
+                    <p class="eyebrow">Guide &middot; browser workbench</p>
+                    <h1>DeepClause Web UI</h1>
+                    <p class="docs-lead">
+                        DeepClause runs entirely in your browser at
+                        <a href="https://web.deepclause.ai">web.deepclause.ai</a>. Author a harness in
+                        <strong>Develop</strong>, put it to work in <strong>Work</strong>, and keep the
+                        workspace in this browser. No account and no DeepClause backend are required.
+                    </p>
+                    <div class="doc-actions">
+                        <a class="button button-primary" href="https://web.deepclause.ai">Open web.deepclause.ai</a>
+                        <a class="button button-secondary" href="dml-language-reference.html">DML reference</a>
+                        <a class="button button-secondary" href="pi-extension.html">pi extension</a>
+                    </div>
+                </header>
+
+                <section id="overview" class="docs-section reveal">
+                    <h2>Overview</h2>
+                    <p>
+                        The Web UI is a local-first workbench around the DML runtime. The browser supplies the
+                        editor, the agent loop, the file workspace, and the Work presentation. Inference uses the
+                        model and credentials you choose.
+                    </p>
+                    <ul>
+                        <li><strong>No signup.</strong> Bring an API key, sign in to a supported provider, or download a local GGUF model.</li>
+                        <li><strong>Workspace in the browser.</strong> Files, harness history, and sessions use origin-private storage (OPFS) and IndexedDB.</li>
+                        <li><strong>No DeepClause backend.</strong> Model requests go from this browser directly to the selected provider.</li>
+                        <li><strong>Two modes.</strong> Develop changes the harness; Work runs what the harness exposes.</li>
+                    </ul>
+                </section>
+
+                <section id="onboarding" class="docs-section reveal">
+                    <h2>Onboarding</h2>
+                    <p>
+                        On the first visit, an animated DeepClause hero introduces the workbench, then the setup
+                        card opens.
+                    </p>
+                    <ol>
+                        <li><strong>Welcome</strong> explains that files and keys stay in the browser.</li>
+                        <li><strong>Model</strong> selects a provider and model, accepts an API key or provider sign-in, or opens the local-model downloader.</li>
+                        <li><strong>Ready</strong> starts the workbench.</li>
+                    </ol>
+                    <p>
+                        Until setup completes, the header controls are disabled. Your model choice and credentials
+                        are stored locally in this browser; they are not sent to DeepClause.
+                    </p>
+                </section>
+
+                <section id="home" class="docs-section reveal">
+                    <h2>Home</h2>
+                    <p>
+                        After setup, the home screen offers two entry points:
+                    </p>
+                    <div class="pillar-grid">
+                        <article class="pillar">
+                            <span class="pillar-kicker">Develop</span>
+                            <h3>Author and refine a harness</h3>
+                            <p>Inspect the program, edit predicates and source, version changes, and manage sessions.</p>
+                            <a class="pillar-link" href="#develop">Develop &rarr;</a>
+                        </article>
+                        <article class="pillar">
+                            <span class="pillar-kicker">Work</span>
+                            <h3>Put a harness to work</h3>
+                            <p>Choose a harness and run its workflows or talk to its Work assistant.</p>
+                            <a class="pillar-link" href="#work">Work &rarr;</a>
+                        </article>
+                    </div>
+                    <p>
+                        The header shows the active model, work status, process dock, home, help, local models, and
+                        setup. Use <strong>Setup</strong> for providers, API keys, MCP servers, and storage information.
+                    </p>
+                </section>
+
+                <section id="develop" class="docs-section reveal">
+                    <h2>Develop</h2>
+                    <p>
+                        Develop is the authoring surface. The left harness tree is the navigation:
+                    </p>
+                    <ul>
+                        <li>Expand a harness to see its predicates, edit sessions, and runner sessions.</li>
+                        <li>Use the chat icon for a new edit session; the agent can inspect, edit, and run the harness.</li>
+                        <li>Use <strong>Content</strong> actions to edit the source, open the diagram, or view version history.</li>
+                        <li>Harness-row actions create, clone, export, import, grant tools, and delete harnesses.</li>
+                    </ul>
+                    <p>
+                        The main pane has three views: <strong>REPL</strong> for authoring chat, <strong>Run</strong> for
+                        runner sessions, and <strong>Files</strong> for the workspace. The composer sends a message
+                        to the active session; <strong>Stop</strong> cancels its current turn.
+                    </p>
+                    <h3>Sessions and versions</h3>
+                    <p>
+                        Sessions are listed per harness. Editing sessions can be resumed; runner sessions show the
+                        typed entry point and inputs. Version history is per harness, and saving the editor creates a
+                        new commit. Renaming, cloning, importing, and exporting all preserve the harness format.
+                    </p>
+                </section>
+
+                <section id="work" class="docs-section reveal">
+                    <h2>Work</h2>
+                    <p>
+                        Work starts with a centered harness chooser. A harness with <code>shell/1</code> defines its
+                        presentation; a harness without one exposes every ordinary predicate as a workflow.
+                    </p>
+                    <h3>Agent and workflow harnesses</h3>
+                    <ul>
+                        <li><strong>Agent shell:</strong> the left side lists exported workflows and Work sessions. The right side is a restricted Work assistant that can use <code>listing</code>, <code>reference</code>, <code>execute</code>, and <code>show_image</code>.</li>
+                        <li><strong>Workflow shell:</strong> the left side lists workflows and runs. The right side shows the run transcript.</li>
+                    </ul>
+                    <p>
+                        Click a workflow to start it. Workflows with arguments open a centered form; workflows with
+                        a <code>file</code> argument open a workspace picker, where you can select an existing file or
+                        upload one before running. The selected workspace-relative path is passed to the DML goal.
+                    </p>
+                    <h3>Work sessions and runs</h3>
+                    <p>
+                        Use <strong>New session</strong> for a fresh Work conversation. <strong>Details</strong>
+                        reveals full tool calls and runtime events. If the harness gains a new version while Work is
+                        open, the header offers a refresh; idle old Work sessions are closed, while a running session
+                        can continue on its snapshot.
+                    </p>
+                    <p>
+                        The harness switcher is pinned to the bottom of the left sidebar. In Work, the main surface
+                        follows the same white authoring surface and grey tree styling as Develop.
+                    </p>
+                </section>
+
+                <section id="files" class="docs-section reveal">
+                    <h2>Files</h2>
+                    <p>
+                        Files is the durable workspace. Use the tree to open files, create new paths, upload files,
+                        download the workspace as a zip, or download the selected file. Text files open in the editor;
+                        images preview inline; other binary files are shown as downloads rather than decoded as text.
+                    </p>
+                </section>
+
+                <section id="models" class="docs-section reveal">
+                    <h2>Models and credentials</h2>
+                    <p>
+                        Choose a model from the header picker, or open <strong>Setup</strong> for provider login and
+                        API keys. Downloaded GGUF models run locally in the browser and are listed in the same picker.
+                        Model and credential changes apply to new turns and Work sessions; a local model must be loaded
+                        before it can serve a request.
+                    </p>
+                </section>
+
+                <section id="privacy" class="docs-section reveal">
+                    <h2>Privacy and storage</h2>
+                    <p>
+                        Workspace files, harness history, and sessions stay in this browser origin. Clearing site data
+                        can remove them, so export important harnesses. API keys are stored in IndexedDB and sent only
+                        to the selected model provider. The app never asks for a DeepClause API key.
+                    </p>
+                </section>
+
+                <section id="mobile" class="docs-section reveal">
+                    <h2>Mobile</h2>
+                    <p>
+                        On phones, Develop uses a slide-in harness tree and Work uses a slide-in workflows/sessions
+                        drawer. The chat and run view use the full width. Controls keep touch-sized targets, and the
+                        shell respects safe areas around notches and the home indicator.
+                    </p>
+                </section>
+
+                <section id="troubleshooting" class="docs-section reveal">
+                    <h2>Troubleshooting</h2>
+                    <ul>
+                        <li><strong>Model requests fail:</strong> check the provider key, sign-in, and selected model in Setup. A provider catalogue probe may return a network error without blocking a configured model.</li>
+                        <li><strong>A local model is slow or cannot load:</strong> loading a GGUF consumes browser memory; close other tabs and use a smaller quantized model.</li>
+                        <li><strong>OAuth does not return:</strong> the provider must allow the redirect from this site. API keys and local models are alternatives.</li>
+                        <li><strong>An old harness is still shown in Work:</strong> use the refresh indicator in the Work header after changing the harness in Develop.</li>
+                        <li><strong>Files disappeared:</strong> check the workspace storage in Setup and avoid clearing site data; export harnesses regularly.</li>
+                    </ul>
+                </section>
+
+                <section id="links" class="docs-section reveal">
+                    <h2>Links</h2>
+                    <p class="link-row">
+                        <a href="https://web.deepclause.ai">Open the Web UI &rarr;</a>
+                        <a href="dml-language-reference.html">DML language reference &rarr;</a>
+                        <a href="dml-sdk-guide.html">DML SDK &amp; CLI guide &rarr;</a>
+                        <a href="pi-extension.html">pi extension &rarr;</a>
+                    </p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-inner">
+            <div>
+                <strong>DeepClause</strong>
+                <p>Executable SOPs and specs for reliable, auditable agents.</p>
+            </div>
+            <div class="footer-links">
+                <a href="../index.html">Home</a>
+                <a href="index.html">Docs</a>
+                <a href="https://github.com/deepclause/sop2harness" target="_blank" rel="noreferrer">sop2harness</a>
+                <a href="https://github.com/deepclause/deepclause-pi" target="_blank" rel="noreferrer">pi extension</a>
+                <a href="https://github.com/deepclause/deepclause-sdk" target="_blank" rel="noreferrer">DML SDK</a>
+                <a href="mailto:support@deepclause.ai">support@deepclause.ai</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../script.js"></script>
+</body>
+</html>
